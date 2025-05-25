@@ -237,8 +237,8 @@ create unique index if not exists uidx_page_builder_demo_containers_model_name_l
 	return
 }
 
-func (b *Builder) WrapPageLayout(warp func(v PageLayoutFunc) PageLayoutFunc) (r *Builder) {
-	b.pageLayoutFunc = warp(b.pageLayoutFunc)
+func (b *Builder) WrapPageLayout(wrap func(v PageLayoutFunc) PageLayoutFunc) (r *Builder) {
+	b.pageLayoutFunc = wrap(b.pageLayoutFunc)
 	return b
 }
 

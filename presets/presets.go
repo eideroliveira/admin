@@ -1327,10 +1327,7 @@ func (b *Builder) wrapInner(f func(p *web.PageBuilder), pf web.PageFunc) http.Ha
 		return func(ctx *web.EventContext) (r web.PageResponse, err error) {
 			r, err = in(ctx)
 			if err == nil && r.Body != nil {
-				currentVuetifyLocale := strings.ReplaceAll(
-					i18n.LanguageTagFromContext(ctx.R.Context(), language.English).String(),
-					"-", "",
-				)
+				currentVuetifyLocale := i18n.LanguageTagFromContext(ctx.R.Context(), language.English).String()
 				r.Body = h.Div(
 					VProgressLinear().
 						Attr(":active", "vars.globalProgressBar.show").
