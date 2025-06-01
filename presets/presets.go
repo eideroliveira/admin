@@ -914,7 +914,7 @@ func (b *Builder) defaultLayoutCompo(_ *web.EventContext, menu, body h.HTMLCompo
 			web.Portal().Name(RightDrawerPortalName),
 
 			// App(true).
-			// Fixed(true),
+			// Fixed(true).
 			// ClippedLeft(true),
 			web.Portal().Name(DialogPortalName),
 			web.Portal().Name(DeleteConfirmPortalName),
@@ -1327,7 +1327,7 @@ func (b *Builder) wrapInner(f func(p *web.PageBuilder), pf web.PageFunc) http.Ha
 		return func(ctx *web.EventContext) (r web.PageResponse, err error) {
 			r, err = in(ctx)
 			if err == nil && r.Body != nil {
-				currentVuetifyLocale := i18n.LanguageTagFromContext(ctx.R.Context(), language.English).String()
+				currentVuetifyLocale := formatVuetifyLocale(i18n.LanguageTagFromContext(ctx.R.Context(), language.English).String())
 				r.Body = h.Div(
 					VProgressLinear().
 						Attr(":active", "vars.globalProgressBar.show").
@@ -1368,6 +1368,31 @@ func (b *Builder) wrapInner(f func(p *web.PageBuilder), pf web.PageFunc) http.Ha
 	}
 
 	return handlers
+}
+
+// formatVuetifyLocale processes the language tag to a format suitable for Vuetify.
+// It specifically handles "xx-XXXX" formatted tags (e.g., "zh-Hans" becomes "zhHans").
+func formatVuetifyLocale(langTag string) string {
+	// Check if the tag is in the format xx-XXXX (e.g., zh-Hans)
+	if len(langTag) == 7 && langTag[2] == '-' {
+		isTwoLetterCode := (langTag[0] >= 'a' && langTag[0] <= 'z') &&
+			(langTag[1] >= 'a' && langTag[1] <= 'z')
+		isFourLetterCode := true
+		if !(langTag[3] >= 'A' && langTag[3] <= 'Z') {
+			isFourLetterCode = false
+		}
+		for i := 4; i < 7 && isFourLetterCode; i++ {
+			if !(langTag[i] >= 'a' && langTag[i] <= 'z') {
+				isFourLetterCode = false
+				break
+			}
+		}
+		if isTwoLetterCode && isFourLetterCode {
+			return langTag[:2] + langTag[3:]
+		}
+	}
+	// For other cases like en-US, de-DE, or if the xx-Xxxx check failed, use it as is.
+	return langTag
 }
 
 func (b *Builder) Build() {
