@@ -231,7 +231,7 @@ func (b *DetailingBuilder) defaultPageFunc(ctx *web.EventContext) (r web.PageRes
 
 	comp := web.Scope(
 		b.ToComponent(b.mb.Info(), obj, ctx),
-	).VSlot("{form}")
+	).VSlot("{form, dash}").DashInit("{errorMessages:{}}")
 	tabsContent := defaultToPage(commonPageConfig{
 		formContent: comp,
 		tabPanels:   b.tabPanels,
