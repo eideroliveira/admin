@@ -23,8 +23,8 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/manifoldco/promptui v0.9.0
 	github.com/markbates/goth v1.80.0
-	github.com/mholt/archiver/v4 v4.0.0-alpha.9
-	github.com/mholt/archiver/v4 v4.0.0-alpha.9
+	github.com/mholt/archiver/v4 v4.0.0-alpha.8
+	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/ory/ladon v1.3.0
@@ -36,7 +36,7 @@ require (
 	github.com/qor5/imaging v1.6.4
 	github.com/qor5/web v1.3.2
 	github.com/qor5/web/v3 v3.0.12-0.20250618085230-3764d0e521a8
-	github.com/qor5/x/v3 v3.1.3-0.20251021020244-c33f2868c60b
+	github.com/qor5/x/v3 v3.0.14-0.20250820082321-0786d7a2ab13
 	github.com/samber/lo v1.50.0
 	github.com/shurcooL/sanitized_anchor_name v1.0.0
 	github.com/spf13/cast v1.7.1
