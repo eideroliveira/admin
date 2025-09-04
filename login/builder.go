@@ -29,6 +29,7 @@ func New(pb *presets.Builder) *login.Builder {
 	r.ChangePasswordPageFunc(defaultChangePasswordPage(vh, pb))
 	r.TOTPSetupPageFunc(defaultTOTPSetupPage(vh, pb))
 	r.TOTPValidatePageFunc(defaultTOTPValidatePage(vh, pb))
+	r.TOTPValidatePageFunc(defaultLoginCodeValidatePage(vh, pb))
 
 	registerChangePasswordEvents(r, pb)
 

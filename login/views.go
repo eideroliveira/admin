@@ -743,3 +743,27 @@ func defaultTOTPValidatePage(vh *login.ViewHelper, pb *presets.Builder) web.Page
 		return
 	})
 }
+
+func defaultLoginCodeValidatePage(vh *login.ViewHelper, pb *presets.Builder) web.PageFunc {
+	return pb.PlainLayout(func(ctx *web.EventContext) (r web.PageResponse, err error) {
+		msgr := i18n.MustGetModuleMessages(ctx.R, login.I18nLoginKey, login.Messages_en_US).(*login.Messages)
+
+		r.PageTitle = msgr.TOTPValidatePageTitle
+		r.Body = Div(
+			DefaultViewCommon.Notice(vh, msgr, ctx.W, ctx.R),
+			Div(
+				Div(
+					H1(msgr.TOTPValidateTitle).
+						Class(DefaultViewCommon.TitleClass),
+					Label(msgr.TOTPValidateEnterCodePrompt),
+				),
+				Form(
+					DefaultViewCommon.Input("otp", msgr.TOTPValidateCodePlaceholder, "").Autofocus(true).Class("mt-6"),
+					DefaultViewCommon.FormSubmitBtn(msgr.Verify),
+				).Method(http.MethodPost).Action(vh.ValidateTOTPURL()),
+			).Class(DefaultViewCommon.WrapperClass).Style(DefaultViewCommon.WrapperStyle).Class("text-center"),
+		)
+
+		return
+	})
+}
