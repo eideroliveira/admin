@@ -36,11 +36,19 @@ require (
 	github.com/qor5/imaging v1.6.4
 	github.com/qor5/web v1.3.2
 	github.com/qor5/web/v3 v3.0.12-0.20250618085230-3764d0e521a8
+<<<<<<< HEAD
 	github.com/qor5/x/v3 v3.0.14-0.20250820082321-0786d7a2ab13
 	github.com/samber/lo v1.50.0
 	github.com/shurcooL/sanitized_anchor_name v1.0.0
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.11.1
+=======
+	github.com/qor5/x/v3 v3.0.14-0.20250905062023-782b462a2bc0
+	github.com/samber/lo v1.50.0
+	github.com/shurcooL/sanitized_anchor_name v1.0.0
+	github.com/spf13/cast v1.7.1
+	github.com/stretchr/testify v1.10.0
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/sunfmin/reflectutils v1.0.6
 	github.com/sunfmin/snippetgo v0.0.3
 	github.com/theplant/bimg v1.1.1
@@ -62,22 +70,24 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/text v0.28.0
+<<<<<<< HEAD
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c
 	google.golang.org/grpc v1.75.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c
-	google.golang.org/grpc v1.75.0
+=======
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.30.1
 )
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go/compute/metadata v0.8.0 // indirect
 	connectrpc.com/connect v1.18.1 // indirect
 	connectrpc.com/cors v0.1.0 // indirect
-	cloud.google.com/go/compute/metadata v0.8.0 // indirect
-	connectrpc.com/connect v1.18.1 // indirect
-	connectrpc.com/cors v0.1.0 // indirect
+=======
+	cloud.google.com/go/compute/metadata v0.7.0 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
@@ -88,8 +98,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.6 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.59 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.28 // indirect
+<<<<<<< HEAD
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4 // indirect
+=======
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.2 // indirect
@@ -123,11 +135,14 @@ require (
 	github.com/docker/docker v28.3.3+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
+<<<<<<< HEAD
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
-	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
+=======
+	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
+	github.com/ebitengine/purego v0.8.4 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -144,12 +159,12 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/form v3.1.4+incompatible // indirect
 	github.com/go-playground/form/v4 v4.2.1 // indirect
+<<<<<<< HEAD
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.25.0 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.25.0 // indirect
+=======
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -160,9 +175,13 @@ require (
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/sessions v1.3.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
+<<<<<<< HEAD
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0 // indirect
+=======
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
@@ -173,14 +192,16 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jjeffery/errors v1.0.3 // indirect
-	github.com/jjeffery/kv v0.8.1 // indirect
+<<<<<<< HEAD
 	github.com/jjeffery/errors v1.0.3 // indirect
 	github.com/jjeffery/kv v0.8.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/leodido/go-urn v1.4.0 // indirect
+=======
+	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/klauspost/pgzip v1.2.6 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
 	github.com/magiconair/properties v1.8.10 // indirect
 	github.com/markbates/going v1.0.3 // indirect
@@ -188,8 +209,10 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mdelapenya/tlscert v0.2.0 // indirect
+<<<<<<< HEAD
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
+=======
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.1.0 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
@@ -205,15 +228,19 @@ require (
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/ory/pagination v0.0.1 // indirect
 	github.com/oschwald/maxminddb-golang v1.13.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
-	github.com/pierrec/lz4/v4 v4.1.22 // indirect
+<<<<<<< HEAD
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/redis/go-redis/v9 v9.11.0 // indirect
 	github.com/rs/cors v1.11.1 // indirect
-	github.com/rs/cors v1.11.1 // indirect
+=======
+	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
+	github.com/redis/go-redis/v9 v9.11.0 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
@@ -232,10 +259,7 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/sourcegraph/syntaxhighlight v0.0.0-20170531221838-bd320f5d308e // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/spf13/afero v1.11.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
-	github.com/spf13/viper v1.19.0 // indirect
-	github.com/subosito/gotenv v1.6.0 // indirect
+<<<<<<< HEAD
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
@@ -244,8 +268,11 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/redis v0.38.0 // indirect
 	github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6 // indirect
 	github.com/theplant/validator v0.0.0-20210202101755-357a9daa8f5f // indirect
-	github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6 // indirect
-	github.com/theplant/validator v0.0.0-20210202101755-357a9daa8f5f // indirect
+=======
+	github.com/testcontainers/testcontainers-go v0.38.0 // indirect
+	github.com/testcontainers/testcontainers-go/modules/redis v0.38.0 // indirect
+	github.com/theplant/inject v1.0.2 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tidwall/gjson v1.17.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -253,14 +280,24 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.15 // indirect
 	github.com/tklauser/numcpus v0.10.0 // indirect
+<<<<<<< HEAD
 	github.com/ulikunitz/xz v0.5.15 // indirect
+=======
+	github.com/ulikunitz/xz v0.5.12 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	github.com/wI2L/jsondiff v0.6.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0 // indirect
+<<<<<<< HEAD
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
+=======
+	go.opentelemetry.io/otel v1.37.0 // indirect
+	go.opentelemetry.io/otel/metric v1.37.0 // indirect
+	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/image v0.23.0 // indirect
@@ -269,12 +306,14 @@ require (
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
+<<<<<<< HEAD
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
+=======
+	google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c // indirect
+>>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
