@@ -758,7 +758,8 @@ func defaultLoginCodeValidatePage(vh *login.ViewHelper, pb *presets.Builder) web
 					Label(msgr.TOTPValidateEnterCodePrompt),
 				),
 				Form(
-					DefaultViewCommon.Input("otp", msgr.TOTPValidateCodePlaceholder, "").Autofocus(true).Class("mt-6"),
+					Input("account").Type("hidden").Value(ctx.R.URL.Query().Get("account")),
+					DefaultViewCommon.Input("logincode", msgr.TOTPValidateCodePlaceholder, "").Autofocus(true).Class("mt-6"),
 					DefaultViewCommon.FormSubmitBtn(msgr.Verify),
 				).Method(http.MethodPost).Action(vh.ValidateTOTPURL()),
 			).Class(DefaultViewCommon.WrapperClass).Style(DefaultViewCommon.WrapperStyle).Class("text-center"),
