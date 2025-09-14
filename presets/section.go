@@ -189,7 +189,7 @@ func (b *SectionBuilder) WrapComponentHoverFunc(w func(in ObjectBoolFunc) Object
 }
 
 func (b *SectionBuilder) WrapSaveBtnFunc(w func(in ObjectBoolFunc) ObjectBoolFunc) (r *SectionBuilder) {
-	b.saveBtnFunc = w(b.componentHoverFunc)
+	b.saveBtnFunc = w(b.saveBtnFunc)
 	return b
 }
 
