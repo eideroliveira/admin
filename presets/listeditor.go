@@ -243,9 +243,9 @@ func (b *ListEditorBuilder) MarshalHTML(c context.Context) (r []byte, err error)
 				).Class("d-flex align-end"),
 			),
 			sorter,
-			h.If(!b.fieldContext.Disabled && hasUpdatePermission,
-				h.Div(
-					form,
+			h.Div(
+				form,
+				h.If(!b.fieldContext.Disabled,
 					VBtn(b.getAddRowBtnLabel(ctx)).
 						Variant(VariantText).
 						Color("primary").
