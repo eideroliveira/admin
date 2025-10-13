@@ -248,6 +248,8 @@ func (b *SectionBuilder) IsList(v interface{}) (r *SectionBuilder) {
 
 	r = b
 	r.editingFB.Model(v)
+	// Eider: shouldn t listing also use the proper model defaults?
+	r.viewingFB.Model(v)
 	r.isList = true
 	r.elementUnmarshaler = r.DefaultElementUnmarshal()
 
