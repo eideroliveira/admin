@@ -262,13 +262,13 @@ func (b *SectionBuilder) Editing(fields ...interface{}) (r *SectionBuilder) {
 	b.editingFB = *b.editingFB.Only(fields...)
 	if b.componentEditFunc == nil {
 		b.EditComponentFunc(func(obj interface{}, field *FieldContext, ctx *web.EventContext) h.HTMLComponent {
-			return b.editingFB.toComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
+			return b.editingFB.ToComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
 		})
 	}
 	if b.isList {
 		if b.elementEditFunc == nil {
 			b.ElementEditComponentFunc(func(obj interface{}, field *FieldContext, ctx *web.EventContext) h.HTMLComponent {
-				return b.editingFB.toComponentWithModifiedIndexes(field.ModelInfo, obj, field.FormKey, ctx)
+				return b.editingFB.ToComponentWithModifiedIndexes(field.ModelInfo, obj, field.FormKey, ctx)
 			})
 		}
 	}
@@ -281,13 +281,13 @@ func (b *SectionBuilder) Viewing(fields ...interface{}) (r *SectionBuilder) {
 	b.viewingFB = *b.viewingFB.Only(fields...)
 	if b.componentViewFunc == nil {
 		b.ViewComponentFunc(func(obj interface{}, field *FieldContext, ctx *web.EventContext) h.HTMLComponent {
-			return b.viewingFB.toComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
+			return b.viewingFB.ToComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
 		})
 	}
 	if b.isList {
 		if b.elementViewFunc == nil {
 			b.ElementShowComponentFunc(func(obj interface{}, field *FieldContext, ctx *web.EventContext) h.HTMLComponent {
-				return b.viewingFB.toComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
+				return b.viewingFB.ToComponentWithModifiedIndexes(field.ModelInfo, obj, "", ctx)
 			})
 		}
 	}
