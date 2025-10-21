@@ -182,7 +182,8 @@ func (a *Handler) createLoginSessionBuilder(loginBuilder *login.Builder, activit
 		IsPublicUser(func(u any) bool {
 			user, ok := u.(*User)
 			return ok && user.GetAccountName() == a.Auth.InitialUserEmail
-		})
+		}).
+		AutoMigrate()
 	a.Use(loginSessionBuilder)
 	return loginSessionBuilder
 }

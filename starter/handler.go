@@ -14,11 +14,13 @@ import (
 	"github.com/qor5/admin/v3/media"
 	"github.com/qor5/admin/v3/presets"
 	"github.com/qor5/admin/v3/presets/gorm2op"
+	"github.com/qor5/admin/v3/role"
 	"github.com/qor5/admin/v3/utils"
 	"github.com/qor5/confx"
 	"github.com/qor5/web/v3"
 	"github.com/qor5/x/v3/hook"
 	"github.com/qor5/x/v3/login"
+	"github.com/qor5/x/v3/perm"
 	"github.com/qor5/x/v3/s3x"
 	"github.com/theplant/inject"
 	"golang.org/x/text/language"
@@ -91,6 +93,10 @@ func (a *Handler) Build(ctx context.Context, ctors ...any) error {
 		return err
 	}
 
+	if err := a.autoMigrate(ctx); err != nil {
+		return err
+	}
+
 	a.configureMediaStorage()
 
 	if err := a.BuildContext(ctx); err != nil {
@@ -117,6 +123,23 @@ func (a *Handler) WithHandlerHook(hooks ...hook.Hook[http.Handler]) *Handler {
 
 func (a *Handler) Use(plugins ...presets.Plugin) {
 	a.plugins = append(a.plugins, plugins...)
+}
+
+// autoMigrate performs database migrations
+func (a *Handler) autoMigrate(ctx context.Context) error {
+	db := a.DB.WithContext(ctx)
+	if err := db.AutoMigrate(
+		&role.Role{},
+		&User{},
+		&perm.DefaultDBPolicy{},
+	); err != nil {
+		return errors.Wrap(err, "failed to auto migrate database")
+	}
+
+	if err := createDefaultRolesIfEmpty(ctx, db); err != nil {
+		return errors.Wrap(err, "failed to initialize default roles")
+	}
+	return nil
 }
 
 // configureMediaStorage configures S3 storage for media
@@ -153,7 +176,7 @@ func (a *Handler) createActivityBuilder() *activity.Builder {
 			})
 			return
 		}
-	})
+	}).AutoMigrate()
 
 	a.Use(activityBuilder)
 	return activityBuilder
@@ -219,7 +242,7 @@ func (a *Handler) createMediaBuilder() *media.Builder {
 			return db.Where("user_id = ?", u.ID)
 		}
 		return db
-	})
+	}).AutoMigrate()
 
 	a.Use(mediaBuilder)
 	return mediaBuilder

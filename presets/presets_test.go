@@ -199,7 +199,7 @@ func TestServeHTTP_HandlerNilAfterOnce_Returns500(t *testing.T) {
 	defer log.SetOutput(orig)
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "/foo", http.NoBody)
+	r := httptest.NewRequest("GET", "/foo", nil)
 
 	b.ServeHTTP(w, r)
 

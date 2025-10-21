@@ -73,7 +73,7 @@ func createDummyAuthCookies(ctx context.Context, user *User, secret string, sess
 	})
 
 	if sessionBuilder != nil {
-		r := httptest.NewRequest("GET", "/", http.NoBody).WithContext(ctx)
+		r := httptest.NewRequest("GET", "/", nil).WithContext(ctx)
 		for _, cookie := range cookies {
 			r.AddCookie(cookie)
 		}
@@ -86,9 +86,6 @@ func createDummyAuthCookies(ctx context.Context, user *User, secret string, sess
 }
 
 func (h *Handler) BuildForTest(ctx context.Context, ctors ...any) error {
-	if err := AutoMigrate(ctx, h.DB); err != nil {
-		return err
-	}
 	if err := h.Build(ctx, ctors...); err != nil {
 		return err
 	}
