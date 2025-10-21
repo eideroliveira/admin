@@ -10,24 +10,35 @@ cloud.google.com/go v0.53.0/go.mod h1:fp/UouUEsRkN6ryDKNW/Upv/JBKnv6WDthjR6+vze6
 cloud.google.com/go/bigquery v1.0.1/go.mod h1:i/xbL2UlR5RvWAURpBYZTtm/cXjCha9lbfbpx4poX+o=
 cloud.google.com/go/bigquery v1.3.0/go.mod h1:PjpwJnslEMmckchkHFfq+HTD2DmtT67aNFKH1/VBDHE=
 <<<<<<< HEAD
+<<<<<<< HEAD
 cloud.google.com/go/compute/metadata v0.8.0 h1:HxMRIbao8w17ZX6wBnjhcDkW6lTFpgcaobyVfZWqRLA=
 cloud.google.com/go/compute/metadata v0.8.0/go.mod h1:sYOGTp851OV9bOFJ9CH7elVvyzopvWQFNNghtDQ/Biw=
 =======
 cloud.google.com/go/compute/metadata v0.7.0 h1:PBWF+iiAerVNe8UCHxdOt6eHLVc3ydFeOCw78U8ytSU=
 cloud.google.com/go/compute/metadata v0.7.0/go.mod h1:j5MvL9PprKL39t166CoB1uVHfQMs4tFQZZcKwksXUjo=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+cloud.google.com/go/compute/metadata v0.8.0 h1:HxMRIbao8w17ZX6wBnjhcDkW6lTFpgcaobyVfZWqRLA=
+cloud.google.com/go/compute/metadata v0.8.0/go.mod h1:sYOGTp851OV9bOFJ9CH7elVvyzopvWQFNNghtDQ/Biw=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 cloud.google.com/go/datastore v1.0.0/go.mod h1:LXYbyblFSglQ5pkeyhO+Qmw7ukd3C+pD7TKLgZqpHYE=
 cloud.google.com/go/pubsub v1.0.1/go.mod h1:R0Gpsv3s54REJCy4fxDixWD93lHJMoZTyQ2kNxGRt3I=
 cloud.google.com/go/pubsub v1.1.0/go.mod h1:EwwdRX2sKPjnvnqCa270oGRyludottCI76h+R3AArQw=
 cloud.google.com/go/storage v1.0.0/go.mod h1:IhtSnM/ZTZV8YYJWCY8RULGVqBDmpoyjwiyrjsg+URw=
 cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0ZeosJ0Rtdos=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 connectrpc.com/connect v1.18.1 h1:PAg7CjSAGvscaf6YZKUefjoih5Z/qYkyaTrBW8xvYPw=
 connectrpc.com/connect v1.18.1/go.mod h1:0292hj1rnx8oFrStN7cB4jjVBeqs+Yx5yDIC2prWDO8=
 connectrpc.com/cors v0.1.0 h1:f3gTXJyDZPrDIZCQ567jxfD9PAIpopHiRDnJRt3QuOQ=
 connectrpc.com/cors v0.1.0/go.mod h1:v8SJZCPfHtGH1zsm+Ttajpozd4cYIUryl4dFB6QEpfg=
+<<<<<<< HEAD
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 dario.cat/mergo v1.0.2 h1:85+piFYR1tMbRrLcDwR18y4UKJ3aH1Tbzi24VRW1TK8=
 dario.cat/mergo v1.0.2/go.mod h1:E/hbnu0NxMFBjpMIE34DRGLWqDy0g5FuKDhCb31ngxA=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
@@ -64,10 +75,15 @@ github.com/aws/aws-sdk-go-v2/credentials v1.17.59/go.mod h1:NM8fM6ovI3zak23UISdW
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.28 h1:KwsodFKVQTlI5EyhRSugALzsV6mG/SGrdjlMXSZSdso=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.28/go.mod h1:EY3APf9MzygVhKuPXAc5H+MkGb8k/DOSQjWS0LgkKqI=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4 h1:2RIi889b7VHUULrQXbB5RcNvN9JZ1VJZPAOG2FJJ6YU=
 github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4/go.mod h1:2oLW5huI9B5XV6ycns7nRLeRJtue48ZB5kZ5ZRL1HSU=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4 h1:2RIi889b7VHUULrQXbB5RcNvN9JZ1VJZPAOG2FJJ6YU=
+github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.4/go.mod h1:2oLW5huI9B5XV6ycns7nRLeRJtue48ZB5kZ5ZRL1HSU=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 h1:ZK5jHhnrioRkUNOc+hOgQKlUL5JeC3S6JgLxtQ+Rm0Q=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34/go.mod h1:p4VfIceZokChbA9FzMbRGz5OV+lekcVtHlPKEO0gSZY=
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 h1:SZwFm17ZUNNg5Np0ioo/gq8Mn6u9w19Mri8DnJ15Jf0=
@@ -129,9 +145,13 @@ github.com/chzyer/test v1.0.0 h1:p3BQDXSxOhOG0P9z6/hGnII4LGiEPOYBhs8asl/fC04=
 github.com/chzyer/test v1.0.0/go.mod h1:2JlltgoNkt4TW/z9V/IzDdFaMTM2JPIi26O1pF38GC8=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/containerd/errdefs v1.0.0 h1:tg5yIfIlQIrxYtu9ajqY42W3lpS19XqdxRQeEwYG8PI=
 github.com/containerd/errdefs v1.0.0/go.mod h1:+YBYIdtsnF4Iw6nWZhJcqGSg/dwvV7tyJ/kCkyJ2k+M=
 github.com/containerd/errdefs/pkg v0.3.0 h1:9IKJ06FvyNlexW690DXuQNx2KA2cUJXx151Xdx3ZPPE=
@@ -170,9 +190,13 @@ github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+m
 github.com/ebitengine/purego v0.8.4 h1:CF7LEKg5FFOsASUj0+QwaXf8Ht6TlFxg09+S9wz0omw=
 github.com/ebitengine/purego v0.8.4/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
@@ -193,12 +217,18 @@ github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHk
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/fsnotify/fsnotify v1.8.0 h1:dAwr6QBTBZIkG8roQaJjGof0pp0EeF+tNV7YBP3F/8M=
 github.com/fsnotify/fsnotify v1.8.0/go.mod h1:8jBTzvmWwFyi3Pb8djgCCO5IBqzKJ/Jwo8TRcHyHii0=
 github.com/gabriel-vasile/mimetype v1.4.8 h1:FfZ3gj38NjllZIeJAmMhr+qKL8Wu+nOoI3GqacKw1NM=
 github.com/gabriel-vasile/mimetype v1.4.8/go.mod h1:ByKUIKGjh1ODkGM1asKUbQZOLGrPjydw3hYPU2YU9t8=
+<<<<<<< HEAD
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/go-chi/chi/v5 v5.2.2 h1:CMwsvRVTbXVytCk1Wd72Zy1LAsAh9GxMmSNWLHCG618=
 github.com/go-chi/chi/v5 v5.2.2/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
@@ -237,6 +267,9 @@ github.com/go-playground/form v3.1.4+incompatible/go.mod h1:lhcKXfTuhRtIZCIKUeJ0
 github.com/go-playground/form/v4 v4.2.1 h1:HjdRDKO0fftVMU5epjPW2SOREcZ6/wLUzEobqUGJuPw=
 github.com/go-playground/form/v4 v4.2.1/go.mod h1:q1a2BY+AQUUzhl6xA/6hBetay6dEIhMHjgvJiGo6K7U=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/go-playground/locales v0.14.1 h1:EWaQ/wswjilfKLTECiXz7Rh+3BjFhfDFKv/oXslEjJA=
 github.com/go-playground/locales v0.14.1/go.mod h1:hxrqLVvrK65+Rwrd5Fc6F2O76J/NuW9t0sjnWqG1slY=
 github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJnYK9S473LQFuzCbDbfSFY=
@@ -244,8 +277,11 @@ github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91
 github.com/go-playground/validator/v10 v10.25.0 h1:5Dh7cjvzR7BRZadnsVOzPhWsrwUr0nmsZJxEAnFLNO8=
 github.com/go-playground/validator/v10 v10.25.0/go.mod h1:GGzBIJMuE98Ic/kJsBXbz1x/7cByt++cQ+YOuDM5wus=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
+<<<<<<< HEAD
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1 h1:FWNFq4fM1wPfcK40yHE5UO3RUdSNPaBC+j3PokzA6OQ=
 github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1/go.mod h1:5YoVOkjYAQumqlV356Hj3xeYh4BdZuLE0/nRkf2NKkI=
 github.com/gogo/protobuf v1.3.2 h1:Ov1cvc58UF3b5XjBnZv7+opcTcQFZebYjWzi34vdm4Q=
@@ -310,16 +346,22 @@ github.com/gosimple/slug v1.14.0/go.mod h1:UiRaFH+GEilHstLUmcBgWcI42viBN7mAb818J
 github.com/gosimple/unidecode v1.0.1 h1:hZzFTMMqSswvf0LBJZCZgThIZrpDHFXux9KeGmn6T/o=
 github.com/gosimple/unidecode v1.0.1/go.mod h1:CP0Cr1Y1kogOtx0bJblKzsVWrqYaqfNOnHzpgWw4Awc=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDaL56wXCB/5+wF6uHfaI=
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0/go.mod h1:g5qyo/la0ALbONm6Vbp88Yd8NsDy6rZz+RcrMPxvld8=
 github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2 h1:sGm2vDRFUrQJO/Veii4h4zG2vvqG6uWNkBHSTqXOZk0=
 github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2/go.mod h1:wd1YpapPLivG6nQgbf7ZkG1hhSOXDhhn4MLTknx2aAc=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0 h1:CWyXh/jylQWp2dtiV33mY4iSSp6yf4lmn+c7/tN+ObI=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0/go.mod h1:nCLIt0w3Ept2NwF8ThLmrppXsfT07oC8k0XNDxd8sVU=
+<<<<<<< HEAD
 =======
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1 h1:VNqngBF40hVlDloBruUehVYC3ArSgIyScOAyMRqBxRg=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1/go.mod h1:RBRO7fro65R6tjKzYgLAFo0t1QEXY1Dp+i/bvpRiqiQ=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=
 github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
@@ -416,12 +458,17 @@ github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW
 github.com/mdelapenya/tlscert v0.2.0 h1:7H81W6Z/4weDvZBNOfQte5GpIMo0lGYEeWbkGp5LJHI=
 github.com/mdelapenya/tlscert v0.2.0/go.mod h1:O4njj3ELLnJjGdkN7M/vIVCpZ+Cf0L6muqOG4tLSl8o=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/mholt/archiver/v4 v4.0.0-alpha.9 h1:EZgAsW6DsuawxDgTtIdjCUBa2TQ6AOe9pnCidofSRtE=
 github.com/mholt/archiver/v4 v4.0.0-alpha.9/go.mod h1:5D3uct315OMkMRXKwEuMB+wQi/2m5NQngKDmApqwVlo=
 =======
 github.com/mholt/archiver/v4 v4.0.0-alpha.8 h1:tRGQuDVPh66WCOelqe6LIGh0gwmfwxUrSSDunscGsRM=
 github.com/mholt/archiver/v4 v4.0.0-alpha.8/go.mod h1:5f7FUYGXdJWUjESffJaYR4R60VhnHxb2X3T1teMyv5A=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/mholt/archiver/v4 v4.0.0-alpha.9 h1:EZgAsW6DsuawxDgTtIdjCUBa2TQ6AOe9pnCidofSRtE=
+github.com/mholt/archiver/v4 v4.0.0-alpha.9/go.mod h1:5D3uct315OMkMRXKwEuMB+wQi/2m5NQngKDmApqwVlo=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/microcosm-cc/bluemonday v1.0.27 h1:MpEUotklkwCSLeH+Qdx1VJgNqLlpY2KXwXFM08ygZfk=
 github.com/microcosm-cc/bluemonday v1.0.27/go.mod h1:jFi9vgW+H7c3V0lb6nR74Ib/DIB5OBs92Dimizgw2cA=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
@@ -466,9 +513,13 @@ github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3I
 github.com/opencontainers/image-spec v1.1.1 h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=
 github.com/opencontainers/image-spec v1.1.1/go.mod h1:qpqAh3Dmcf36wStyyWU+kCeDgrGnAve2nCC8+7h8Q0M=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/orcaman/concurrent-map/v2 v2.0.1 h1:jOJ5Pg2w1oeB6PeDurIYf6k9PQ+aTITr/6lP/L/zp6c=
 github.com/orcaman/concurrent-map/v2 v2.0.1/go.mod h1:9Eq3TG2oBe5FirmYWQfYO5iH1q0Jv47PLaNK++uCdOM=
 github.com/ory/ladon v1.3.0 h1:35Rc3O8d+mhFWxzmKs6Qj/ETQEHGEI5BmWQf8wtqFHk=
@@ -512,12 +563,19 @@ github.com/qor5/web v1.3.2/go.mod h1:LszskQJbFQDJwOeZC6j6afOiHxxyjrzz8B3zuBwfgKQ
 github.com/qor5/web/v3 v3.0.12-0.20250618085230-3764d0e521a8 h1:s3jBS5bq6VX56GicRPCeXvb0TRLSz5w1xJHymPnhTuo=
 github.com/qor5/web/v3 v3.0.12-0.20250618085230-3764d0e521a8/go.mod h1:hrhZ4nc1U+AOBrGmnUoRUPpA9fymxlAbNfGvn9TJLns=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/qor5/x/v3 v3.1.3-0.20251021020244-c33f2868c60b h1:apfqd+AQQHNzUx34jZQ2zxhV05/z+q/ftqB1DivKok0=
 github.com/qor5/x/v3 v3.1.3-0.20251021020244-c33f2868c60b/go.mod h1:63Xf2S/u3kCH/ByS8Q+XCJOAAv8CvFO2GtMOO7kHITk=
 =======
 github.com/qor5/x/v3 v3.0.14-0.20250905062023-782b462a2bc0 h1:UEUQgI4J+IRmUz5iIYzB3xT6kttZta3NPW96suR1izI=
 github.com/qor5/x/v3 v3.0.14-0.20250905062023-782b462a2bc0/go.mod h1:P/P6ykgIQRlnFsAvphSh0jjloWLXt1ghsgT60vSD5lo=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/qor5/x/v3 v3.1.3-0.20251016020953-4d227d199456 h1:BTwsRW2eb/lHBC31xhzbC48hVTSVgUShLs3f1YtPiVQ=
+github.com/qor5/x/v3 v3.1.3-0.20251016020953-4d227d199456/go.mod h1:ZtfomAwdcec3E0CNM7oSLNLJRRkTa2OsND7bmJl5Kzg=
+github.com/qor5/x/v3 v3.1.3-0.20251021020244-c33f2868c60b h1:apfqd+AQQHNzUx34jZQ2zxhV05/z+q/ftqB1DivKok0=
+github.com/qor5/x/v3 v3.1.3-0.20251021020244-c33f2868c60b/go.mod h1:63Xf2S/u3kCH/ByS8Q+XCJOAAv8CvFO2GtMOO7kHITk=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/redis/go-redis/v9 v9.11.0 h1:E3S08Gl/nJNn5vkxd2i78wZxWAPNZgUNTp8WIJUAiIs=
 github.com/redis/go-redis/v9 v9.11.0/go.mod h1:huWgSWd8mW6+m0VPhJjSSQ+d6Nh1VICQ6Q5lHuCH/Iw=
 github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
@@ -533,12 +591,18 @@ github.com/russross/blackfriday v1.6.0 h1:KqfZb0pUVN2lYqZUYRddxF4OR8ZMURnJIG5Y3V
 github.com/russross/blackfriday v1.6.0/go.mod h1:ti0ldHuxg49ri4ksnFxlkCfN+hvslNlmVHqNRXXJNAY=
 github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd/go.mod h1:hPqNNc0+uJM6H+SuU8sEs5K5IQeKccPqeSjfgcKGgPk=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/sagikazarmark/locafero v0.6.0 h1:ON7AQg37yzcRPU69mt7gwhFEBwxI6P9T4Qu3N51bwOk=
 github.com/sagikazarmark/locafero v0.6.0/go.mod h1:77OmuIc6VTraTXKXIs/uvUxKGUXjE1GbemJYHqdNjX0=
 github.com/sagikazarmark/slog-shim v0.1.0 h1:diDBnUNK9N/354PgrxMywXnAwEr1QZcOr6gto+ugjYE=
 github.com/sagikazarmark/slog-shim v0.1.0/go.mod h1:SrcSrq8aKtyuqEI1uvTDTK1arOWRIczQRv+GVI1AkeQ=
+<<<<<<< HEAD
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/samber/lo v1.50.0 h1:XrG0xOeHs+4FQ8gJR97zDz5uOFMW7OwFWiFVzqopKgY=
 github.com/samber/lo v1.50.0/go.mod h1:RjZyNk6WSnUFRKK6EyOhsRJMqft3G+pg7dCWHQCWvsc=
 github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516/go.mod h1:Yow6lPLSAXx2ifx470yD/nUe22Dv5vBvxK/UK9UUTVs=
@@ -577,6 +641,9 @@ github.com/sourcegraph/syntaxhighlight v0.0.0-20170531221838-bd320f5d308e/go.mod
 github.com/spaolacci/murmur3 v1.1.0 h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/spf13/afero v1.11.0 h1:WJQKhtpdm3v2IzqG8VMqrr6Rf3UYpEF239Jy9wNepM8=
 github.com/spf13/afero v1.11.0/go.mod h1:GH9Y3pIexgf1MTIWtNGyogA5MwRIDXGUr+hbWNoBjkY=
 github.com/spf13/cast v1.7.1 h1:cuNEagBQEHWN1FnbGEjCXL2szYEXqfJPbP2HNUaca9Y=
@@ -585,10 +652,13 @@ github.com/spf13/pflag v1.0.6 h1:jFzHGLGAlb3ruxLB8MhbI6A8+AQX/2eW4qeyNZXNp2o=
 github.com/spf13/pflag v1.0.6/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/spf13/viper v1.19.0 h1:RWq5SEjt8o25SROyN3z2OrDB9l7RPd3lwTWU8EcEdcI=
 github.com/spf13/viper v1.19.0/go.mod h1:GQUN9bilAbhU/jgc1bKs99f/suXKeUMct8Adx5+Ntkg=
+<<<<<<< HEAD
 =======
 github.com/spf13/cast v1.7.1 h1:cuNEagBQEHWN1FnbGEjCXL2szYEXqfJPbP2HNUaca9Y=
 github.com/spf13/cast v1.7.1/go.mod h1:ancEpBxwJDODSW/UG4rDrAqiKolqNNh2DX3mk86cAdo=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -612,7 +682,12 @@ github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSW
 =======
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+<<<<<<< HEAD
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/subosito/gotenv v1.6.0 h1:9NlTDc1FTs4qu0DDq7AEtTPNw6SVm7uBMsUCUjABIf8=
+github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSWPKKo0FU=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/sunfmin/reflectutils v1.0.6 h1:tX1ecTgYLsv2F8iBO2JL3BY2AdMtyFz/ir3ip+njFNs=
 github.com/sunfmin/reflectutils v1.0.6/go.mod h1:ao2bbF4RZrTe2PboJKdZoC3BA71gdU6rFkCuUjoeqMw=
 github.com/sunfmin/snippetgo v0.0.3 h1:pMCpFCyW2fYHhfLp4tb5ccvTCpIuSNFomtDCr9duUaE=
@@ -622,10 +697,15 @@ github.com/testcontainers/testcontainers-go v0.38.0/go.mod h1:C52c9MoHpWO+C4aqmg
 github.com/testcontainers/testcontainers-go/modules/redis v0.38.0 h1:289pn0BFmGqDrd6BrImZAprFef9aaPZacx07YOQaPV4=
 github.com/testcontainers/testcontainers-go/modules/redis v0.38.0/go.mod h1:EcKPWRzOglnQfYe+ekA8RPEIWSNJTGwaC5oE5bQV+D0=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6 h1:LQEFJ4e9i7Yyv0Drk2/rZOakxzFWATFwpcjwW8E2wuU=
 github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6/go.mod h1:Eg9VHkTQzjBVksZIMq9SkmbOcrCiOm4objkq0LhH+Io=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6 h1:LQEFJ4e9i7Yyv0Drk2/rZOakxzFWATFwpcjwW8E2wuU=
+github.com/theplant/appkit v0.0.0-20250528023215-3d0d299dc4c6/go.mod h1:Eg9VHkTQzjBVksZIMq9SkmbOcrCiOm4objkq0LhH+Io=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/theplant/bimg v1.1.1 h1:97KW0oDbGt8d3K7vu2rgM88gT/+beWzTu0ZwtlqcxwE=
 github.com/theplant/bimg v1.1.1/go.mod h1:H0qlp9lKZoOO4akI0VxEtxO8lgLBLNuhF/+2U00LSPg=
 github.com/theplant/docgo v0.0.16 h1:6K6IHfeQ0sx9k7b1h9L6RV2pD0SiN8TAQm1RNLYezgU=
@@ -637,12 +717,17 @@ github.com/theplant/htmlgo v1.0.3/go.mod h1:pCKSFJsoVNkyW+yN2i1Mst+8130NSQzIU7L2
 github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 h1:yPrgtU8bj7Q/XbXgjjmngZtOhsUufBAraruNwxv/eXM=
 github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967/go.mod h1:86iN4EAYaQbx1VTW5uPslTIviRkYH8CzslMC//g+BgY=
 <<<<<<< HEAD
+<<<<<<< HEAD
 github.com/theplant/inject v1.1.0 h1:Bxiu4rXQN0BJSwNHAMPszkiySmozPTYZvbhaOKJr+lg=
 github.com/theplant/inject v1.1.0/go.mod h1:vuuYp7lKifex8HfI4izobKSqulfhpWIvGvW2/pP4Rqo=
 =======
 github.com/theplant/inject v1.0.2 h1:JXN2C/bAWJ9COG53WGoM9npJyYpwufYTHop+x2abDaQ=
 github.com/theplant/inject v1.0.2/go.mod h1:vuuYp7lKifex8HfI4izobKSqulfhpWIvGvW2/pP4Rqo=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+github.com/theplant/inject v1.1.0 h1:Bxiu4rXQN0BJSwNHAMPszkiySmozPTYZvbhaOKJr+lg=
+github.com/theplant/inject v1.1.0/go.mod h1:vuuYp7lKifex8HfI4izobKSqulfhpWIvGvW2/pP4Rqo=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 github.com/theplant/osenv v0.0.2 h1:SI2I/gLQQj5pQgpBQ8YKx/u4i7KE7yG2Gmr/ZORuxn8=
 github.com/theplant/osenv v0.0.2/go.mod h1:gUdlLzvmJb/dyBmXk+qEWiIhAN1tmVhYktzK1HHEz3c=
 github.com/theplant/relay v0.8.0 h1:pch57yct/dnM3Mf0zmQEppC4No4Hv2Qu0R36iHDvHZw=
@@ -737,7 +822,12 @@ go.opentelemetry.io/otel/trace v1.37.0 h1:HLdcFNbRQBE2imdSEgm/kwqmQj1Or1l/7bW6mx
 go.opentelemetry.io/otel/trace v1.37.0/go.mod h1:TlgrlQ+PtQO5XFerSPUYG0JSgGyryXewPGyayAWSBS0=
 go.opentelemetry.io/proto/otlp v1.5.0 h1:xJvq7gMzB31/d406fB8U5CBdyQGw4P399D1aQWU/3i4=
 go.opentelemetry.io/proto/otlp v1.5.0/go.mod h1:keN8WnHxOy8PG0rQZjJJ5A2ebUoafqWp0eVQ4yIXvJ4=
+<<<<<<< HEAD
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+go.uber.org/atomic v1.7.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
+go.uber.org/goleak v1.1.10/go.mod h1:8a7PlsEVH3e/a/GLqe5IIrQx6GzcnRmZEufDUTk4A7A=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 go.uber.org/multierr v1.6.0/go.mod h1:cdWPpRnG4AhwMwsgIHip0KRBQjJy5kYEpYjJxpXp9iU=
@@ -982,6 +1072,7 @@ google.golang.org/genproto v0.0.0-20191216164720-4f79533eabd1/go.mod h1:n3cpQtvx
 google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb/go.mod h1:n3cpQtvxv34hfy77yVDNjmbRyujviMdxYliBSkLhpCc=
 google.golang.org/genproto v0.0.0-20200212174721-66ed5ce911ce/go.mod h1:55QSHmfGQM9UVYDPBsyGGes0y52j32PQ3BqQfXhyH3c=
 <<<<<<< HEAD
+<<<<<<< HEAD
 google.golang.org/genproto v0.0.0-20200423170343-7949de9c1215/go.mod h1:55QSHmfGQM9UVYDPBsyGGes0y52j32PQ3BqQfXhyH3c=
 google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c h1:AtEkQdl5b6zsybXcbz00j1LwNodDuH6hVifIaNqk7NQ=
 google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c/go.mod h1:ea2MjsO70ssTfCjiwHgI0ZFqcw45Ksuk2ckf9G468GA=
@@ -989,6 +1080,11 @@ google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c/go.
 google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a h1:DMCgtIAIQGZqJXMVzJF4MV8BlWoJh2ZuFiRdAleyr58=
 google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a/go.mod h1:y2yVLIE/CSMCPXaHnSKXxu1spLPnglFLegmgdY23uuE=
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+google.golang.org/genproto v0.0.0-20200423170343-7949de9c1215/go.mod h1:55QSHmfGQM9UVYDPBsyGGes0y52j32PQ3BqQfXhyH3c=
+google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c h1:AtEkQdl5b6zsybXcbz00j1LwNodDuH6hVifIaNqk7NQ=
+google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c/go.mod h1:ea2MjsO70ssTfCjiwHgI0ZFqcw45Ksuk2ckf9G468GA=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c h1:qXWI/sQtv5UKboZ/zUk7h+mrf/lXORyI+n9DKDAusdg=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c/go.mod h1:gw1tLEfykwDz2ET4a12jcXt4couGAm7IwsVaTy0Sflo=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
@@ -1001,9 +1097,13 @@ google.golang.org/grpc v1.26.0/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8
 google.golang.org/grpc v1.27.0/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8abTk=
 google.golang.org/grpc v1.27.1/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8abTk=
 <<<<<<< HEAD
+<<<<<<< HEAD
 google.golang.org/grpc v1.29.1/go.mod h1:itym6AZVZYACWQqET3MqgPpjcuV5QH3BxFS3IjizoKk=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+google.golang.org/grpc v1.29.1/go.mod h1:itym6AZVZYACWQqET3MqgPpjcuV5QH3BxFS3IjizoKk=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 google.golang.org/grpc v1.75.0 h1:+TW+dqTd2Biwe6KKfhE5JpiYIBWq865PhKGSXiivqt4=
 google.golang.org/grpc v1.75.0/go.mod h1:JtPAzKiq4v1xcAB2hydNlWI2RnF85XXcV0mhKXr2ecQ=
 google.golang.org/protobuf v1.36.8 h1:xHScyCOEuuwZEc6UtSOvPbAT4zRh0xcNRYekJwfqyMc=
@@ -1018,10 +1118,15 @@ gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMy
 gopkg.in/go-playground/assert.v1 v1.2.1 h1:xoYuJVE7KT85PYWrN730RguIQO0ePzVRfFMXadIrXTM=
 gopkg.in/go-playground/assert.v1 v1.2.1/go.mod h1:9RXL0bg/zibRAgZUYszZSwO/z8Y/a8bDuhia5mkpMnE=
 <<<<<<< HEAD
+<<<<<<< HEAD
 gopkg.in/ini.v1 v1.67.0 h1:Dgnx+6+nfE+IfzjUEISNeydPJh9AXNNsWbGP9KzCsOA=
 gopkg.in/ini.v1 v1.67.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
 =======
 >>>>>>> a31bbd5a (Update dependencies in go.mod and go.sum)
+=======
+gopkg.in/ini.v1 v1.67.0 h1:Dgnx+6+nfE+IfzjUEISNeydPJh9AXNNsWbGP9KzCsOA=
+gopkg.in/ini.v1 v1.67.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
+>>>>>>> d74718de (Add starter package and update dependencies (#1030))
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
