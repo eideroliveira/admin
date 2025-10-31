@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/qor5/web/v3"
-	"github.com/qor5/x/v3/perm"
 	. "github.com/qor5/x/v3/ui/vuetify"
 	"github.com/sunfmin/reflectutils"
 	h "github.com/theplant/htmlgo"
@@ -123,7 +122,7 @@ func (b *ListEditorBuilder) MarshalHTML(c context.Context) (r []byte, err error)
 	deletedIndexes := ContextModifiedIndexesBuilder(ctx)
 
 	// Check if user has update permission for nested operations
-	hasUpdatePermission := false
+	hasUpdatePermission := true
 	if b.fieldContext.ModelInfo != nil {
 		hasUpdatePermission = b.fieldContext.ModelInfo.Verifier().Do(PermUpdate).WithReq(ctx.R).IsAllowed() == nil
 	}
@@ -264,9 +263,8 @@ func (b *ListEditorBuilder) MarshalHTML(c context.Context) (r []byte, err error)
    				).Attr("v-show", h.JSONString(!isSortStart)).
 					Class("mt-1 mb-4"),
 			),
-		//).Init(h.JSONString(sorterData)).VSlot("{ locals, dash, form }").
-		 // DashInit("{errorMessages:{},disabled:{}}"),
-		).Init(h.JSONString(sorterData)).VSlot("{ locals }")
+		).Init(h.JSONString(sorterData)).VSlot("{ locals }"),
+
 		// Read-only view when user doesn't have update permission or field is disabled
 		h.If(b.fieldContext.Disabled || !hasUpdatePermission,
 			h.Div(
@@ -284,7 +282,6 @@ func addListItemRow(mb *ModelBuilder) web.EventFunc {
 		obj, _ := me.FetchAndUnmarshal(id, false, ctx)
 
 		if mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-			ShowMessage(&r, perm.PermissionDenied.Error(), ColorError)
 			return r, nil
 		}
 
@@ -308,7 +305,6 @@ func removeListItemRow(mb *ModelBuilder) web.EventFunc {
 		obj, _ := me.FetchAndUnmarshal(id, false, ctx)
 
 		if mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-			ShowMessage(&r, perm.PermissionDenied.Error(), ColorError)
 			return r, nil
 		}
 
@@ -336,7 +332,6 @@ func sortListItems(mb *ModelBuilder) web.EventFunc {
 		obj, _ := me.FetchAndUnmarshal(id, false, ctx)
 
 		if mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-			ShowMessage(&r, perm.PermissionDenied.Error(), ColorError)
 			return r, nil
 		}
 
