@@ -305,7 +305,7 @@ func (b *Builder) Install(pb *presets.Builder) error {
 		if qorJob.Job == "" {
 			return errors.New("job is required")
 		}
-		j, err := b.createJob(ctx, qorJob)
+		j, err := b.CreateJob(ctx, qorJob)
 		if err != nil {
 			return err
 		}
@@ -449,7 +449,7 @@ func (b *Builder) Shutdown(ctx context.Context) error {
 	return b.q.Shutdown(ctx)
 }
 
-func (b *Builder) createJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, err error) {
+func (b *Builder) CreateJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, err error) {
 	if err = editIsAllowed(ctx.R, qorJob.Job); err != nil {
 		return
 	}

@@ -637,11 +637,10 @@ func (b *EditingBuilder) SaveOverlayContent(
 }
 
 func (b *EditingBuilder) RunSetterFunc(ctx *web.EventContext, removeDeletedAndSort bool, toObj interface{}) (vErr web.ValidationErrors) {
+	vErr = b.Unmarshal(toObj, b.mb.Info(), removeDeletedAndSort, ctx)
 	if b.Setter != nil {
 		b.Setter(toObj, ctx)
 	}
-
-	vErr = b.Unmarshal(toObj, b.mb.Info(), removeDeletedAndSort, ctx)
 
 	return
 }

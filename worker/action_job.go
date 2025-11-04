@@ -116,7 +116,7 @@ func (b *Builder) eventActionJobCreate(ctx *web.EventContext) (r web.EventRespon
 		return r, fmt.Errorf("job %s not found", jobName)
 	}
 
-	job, err := b.createJob(ctx, qorJob)
+	job, err := b.CreateJob(ctx, qorJob)
 	if err != nil {
 		return
 	}
