@@ -177,7 +177,7 @@ func (b *Builder) eventActionJobInputParams(ctx *web.EventContext) (r web.EventR
 				)).
 				Attr("v-model", "vars.presetsDialog").
 				Width("600").Persistent(true),
-		).VSlot("{ form }"),
+		).VSlot("{ form, dash }").DashInit("{errorMessages:{},disabled:{}}"),
 	})
 	r.RunScript = "setTimeout(function(){vars.presetsDialog = true; }, 100)"
 	return
