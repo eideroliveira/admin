@@ -261,12 +261,13 @@ func (b *ListEditorBuilder) MarshalHTML(c context.Context) (r []byte, err error)
 							Query(ParamOverlay, ctx.R.FormValue(ParamOverlay)).
 							Query(ParamAddRowFormKey, b.fieldContext.FormKey).
 							Go()),
-			).Attr("v-show", h.JSONString(!isSortStart)).
-				Class("mt-1 mb-4"),
+   				).Attr("v-show", h.JSONString(!isSortStart)).
+					Class("mt-1 mb-4"),
+			),
 		//).Init(h.JSONString(sorterData)).VSlot("{ locals, dash, form }").
 		 // DashInit("{errorMessages:{},disabled:{}}"),
 		).Init(h.JSONString(sorterData)).VSlot("{ locals }")
-			// Read-only view when user doesn't have update permission or field is disabled
+		// Read-only view when user doesn't have update permission or field is disabled
 		h.If(b.fieldContext.Disabled || !hasUpdatePermission,
 			h.Div(
 				h.Label(b.fieldContext.Label).Class("v-label theme--light text-caption"),
