@@ -143,7 +143,7 @@ func (b *ModelBuilder) renderContainersSortedList(ctx *web.EventContext) (r h.HT
 		isReadonly                  = status != publish.StatusDraft && !b.isTemplate
 		pageID, pageVersion, locale = b.getPrimaryColumnValuesBySlug(ctx)
 		msgr                        = i18n.MustGetModuleMessages(ctx.R, I18nPageBuilderKey, Messages_en_US).(*Messages)
-		pMsgr                       = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, Messages_en_US).(*presets.Messages)
+		pMsgr                       = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, presets.Messages_en_US).(*presets.Messages)
 	)
 	wc := map[string]interface{}{
 		"page_model_name": b.name,
@@ -641,7 +641,7 @@ func (b *ModelBuilder) renderContainerHover(cb *ContainerBuilder, ctx *web.Event
 		BeforeScript("pLocals.creating=true").
 		Query(paramModelName, cb.name).
 		Query(paramStatus, ctx.Param(paramStatus)).
-		ThenScript("vars.overlay=false;xLocals.add=true").
+		ThenScript("vars.overlay=false/*;xLocals.add=true*/").
 		Go()
 	return VHover(
 		web.Slot(

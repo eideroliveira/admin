@@ -1565,7 +1565,7 @@ func (b *Builder) deviceToggle(ctx *web.EventContext) h.HTMLComponent {
 		comps   []h.HTMLComponent
 		device  = ctx.Param(paramDevice)
 		devices = b.getDevices()
-		pMsgr   = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, Messages_en_US).(*presets.Messages)
+		pMsgr   = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, presets.Messages_en_US).(*presets.Messages)
 		isDraft = ctx.Param(paramStatus) == publish.StatusDraft
 	)
 
