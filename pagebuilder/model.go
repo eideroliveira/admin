@@ -492,14 +492,14 @@ func (b *ModelBuilder) renderScrollIframe(comps []h.HTMLComponent, ctx *web.Even
 		}
 		r = b.builder.pageLayoutFunc(h.Components(comps...), input, newCtx)
 		newCtx.Injector.HeadHTMLComponent("style", b.builder.pageStyle, true)
-		body := h.Components(h.Div(
-			r,
-		).Id("app").Attr("v-cloak", true),
-			newCtx.Injector.GetTailHTMLComponent(),
-		)
-		if isReloadBody {
-			return body
-		}
+		// body := h.Components(h.Div(
+		// 	r,
+		// ).Id("app").Attr("v-cloak", true),
+		// 	newCtx.Injector.GetTailHTMLComponent(),
+		// )
+		// if isReloadBody {
+		// 	return body
+		// }
 		r = h.HTMLComponents{
 			h.RawHTML("<!DOCTYPE html>\n"),
 			h.Tag("html").Children(
@@ -513,6 +513,9 @@ func (b *ModelBuilder) renderScrollIframe(comps []h.HTMLComponent, ctx *web.Even
 					newCtx.Injector.GetTailHTMLComponent(),
 				).Class("front"),
 			).Attr(newCtx.Injector.HTMLLangAttrs()...),
+		}
+		if isReloadBody {
+			return r
 		}
 
 		_, width := b.builder.getDevice(ctx)
