@@ -397,7 +397,7 @@ func (b *EditingBuilder) editFormFor(obj interface{}, ctx *web.EventContext) h.H
 				).Class("pa-2 detailing-page-wrap"),
 			),
 		),
-	).VSlot("{ form}")
+	).VSlot("{ form, dash}").DashInit("{errorMessages:{},disabled:{}}")
 	operateID := fmt.Sprint(time.Now().UnixNano())
 	onChangeEvent += checkFormChangeScript
 	if autosave {
