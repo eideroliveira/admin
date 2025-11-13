@@ -263,8 +263,8 @@ func (b *ListEditorBuilder) MarshalHTML(c context.Context) (r []byte, err error)
    				).Attr("v-show", h.JSONString(!isSortStart)).
 					Class("mt-1 mb-4"),
 			),
-		).Init(h.JSONString(sorterData)).VSlot("{ locals }"),
-
+		).Init(h.JSONString(sorterData)).VSlot("{ locals, dash }").
+			DashInit("{errorMessages:{},disabled:{}}"),
 		// Read-only view when user doesn't have update permission or field is disabled
 		h.If(b.fieldContext.Disabled || !hasUpdatePermission,
 			h.Div(
