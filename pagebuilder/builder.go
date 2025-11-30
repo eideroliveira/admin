@@ -1423,6 +1423,10 @@ func (b *Builder) republishRelatedOnlinePages(ctx *web.EventContext) (r web.Even
 }
 
 func (b *Builder) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.Contains(r.RequestURI, path.Join(b.pb.GetURIPrefix(), b.prefix, "export/pages")) {
+		b.exportPages(w, r)
+		return
+	}
 	for _, mb := range b.models {
 		previewURI := path.Join(b.pb.GetURIPrefix(), b.prefix, mb.mb.Info().URIName(), "preview")
 		if strings.Contains(r.RequestURI, previewURI) {
