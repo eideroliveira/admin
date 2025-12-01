@@ -38,50 +38,21 @@ func (b *Builder) defaultPageInstall(pb *presets.Builder, pm *presets.ModelBuild
 	lb.BulkAction("Export Pages").ButtonCompFunc(func(ctx *web.EventContext) h.HTMLComponent {
 		return VBtn("Export Pages").
 			PrependIcon("mdi-download").
-			Attr("@click", fmt.Sprintf("window.open('%s/export/pages?ids=' + vars.selectedIds.join(','), '_blank')", path.Join(b.pb.GetURIPrefix(), b.prefix)))
+			Attr("@click", web.Plaid().
+				EventFunc("page_builder_export_pages").
+				Query("ids", web.Var("locals.selected_ids.join(',')")).
+				Go())
 	})
 
+	pb.GetWebBuilder().RegisterEventFunc("page_builder_export_pages", b.exportPagesEvent)
 	pb.GetWebBuilder().RegisterEventFunc("page_builder_import_pages", b.importPages)
 
 	lb.NewButtonFunc(func(ctx *web.EventContext) h.HTMLComponent {
 		msgr := i18n.MustGetModuleMessages(ctx.R, I18nPageBuilderKey, Messages_en_US).(*Messages)
-		return h.Div(
-			VBtn(msgr.New).
-				Color(ColorPrimary).
-				Theme(ThemeDark).
-				Href(fmt.Sprintf("%s/new", pm.Info().ListingHref())),
-			VBtn("Import Pages").
-				PrependIcon("mdi-upload").
-				Color("secondary").
-				Class("ml-2").
-				Attr("@click", "vars.importDialog = true"),
-			VDialog(
-				VCard(
-					VCardTitle(h.Text("Import Pages")),
-					VCardText(
-						VFileInput().
-							Label("Select File").
-							Attr("name", "ImportFile").
-							Attr("accept", ".json"),
-					),
-					VCardActions(
-						VSpacer(),
-						VBtn("Cancel").
-							Variant("text").
-							Attr("@click", "vars.importDialog = false"),
-						VBtn("Import").
-							Color("primary").
-							Attr("@click", web.Plaid().
-								EventFunc("page_builder_import_pages").
-								URL(ctx.R.URL.Path).
-								Go()),
-					),
-				),
-			).
-				ModelValue(false).
-				Attr("v-model", "vars.importDialog").
-				Width("500"),
-		).Class("d-flex")
+		return VBtn(msgr.New).
+			Color(ColorPrimary).
+			Theme(ThemeDark).
+			Href(fmt.Sprintf("%s/new", pm.Info().ListingHref()))
 	})
 
 	pm.LabelName(func(evCtx *web.EventContext, singular bool) string {

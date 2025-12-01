@@ -1423,12 +1423,12 @@ func (b *Builder) republishRelatedOnlinePages(ctx *web.EventContext) (r web.Even
 }
 
 func (b *Builder) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.RequestURI, path.Join(b.pb.GetURIPrefix(), b.prefix, "export/pages")) {
+	if strings.Contains(r.RequestURI, path.Join(b.prefix, "export/pages")) {
 		b.exportPages(w, r)
 		return
 	}
 	for _, mb := range b.models {
-		previewURI := path.Join(b.pb.GetURIPrefix(), b.prefix, mb.mb.Info().URIName(), "preview")
+		previewURI := path.Join(b.prefix, mb.mb.Info().URIName(), "preview")
 		if strings.Contains(r.RequestURI, previewURI) {
 			if mb.mb.Info().Verifier().Do(presets.PermGet).WithReq(r).IsAllowed() != nil {
 				_, _ = w.Write([]byte(perm.PermissionDenied.Error()))

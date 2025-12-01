@@ -89,14 +89,47 @@ func (b *TemplateBuilder) configModelWithTemplate(mb *presets.ModelBuilder) {
 	if filed != nil && filed.GetCompFunc() == nil {
 		mb.Listing().NewButtonFunc(func(ctx *web.EventContext) h.HTMLComponent {
 			msgr := i18n.MustGetModuleMessages(ctx.R, I18nPageBuilderKey, Messages_en_US).(*Messages)
-			return h.Components(
-				web.Portal().Name(TemplateSelectDialogPortalName),
-				VBtn(msgr.New).
-					Color(ColorPrimary).
-					Variant(VariantElevated).
-					Theme("light").Class("ml-2").
-					Attr("@click", web.Plaid().URL(b.tm.mb.Info().ListingHref()).EventFunc(actions.OpenListingDialog).Query(presets.ParamOverlay, actions.Dialog).Go()),
-			)
+			return h.Div(
+				web.Scope(
+					web.Portal().Name(TemplateSelectDialogPortalName),
+					VBtn(msgr.New).
+						Color(ColorPrimary).
+						Variant(VariantElevated).
+						Theme("light").Class("ml-2").
+						Attr("@click", web.Plaid().URL(b.tm.mb.Info().ListingHref()).EventFunc(actions.OpenListingDialog).Query(presets.ParamOverlay, actions.Dialog).Go()),
+					VBtn("Import Pages").
+						PrependIcon("mdi-upload").
+						Color("secondary").
+						Class("ml-2").
+						Attr("@click", "locals.importDialog = true"),
+					VDialog(
+						VCard(
+							VCardTitle(h.Text("Import Pages")),
+							VCardText(
+								VFileInput().
+									Label("Select File").
+									Attr("v-model", "form.ImportFile").
+									Attr("accept", ".json"),
+							),
+							VCardActions(
+								VSpacer(),
+								VBtn("Cancel").
+									Variant("text").
+									Attr("@click", "locals.importDialog = false"),
+								VBtn("Import").
+									Color("primary").
+									Attr("@click", web.Plaid().
+										EventFunc("page_builder_import_pages").
+										URL(ctx.R.URL.Path).
+										Go()),
+							),
+						),
+					).
+						ModelValue(false).
+						Attr("v-model", "locals.importDialog").
+						Width("500"),
+				).Init("{ importDialog: false }").VSlot("{ locals, form }"),
+			).Class("d-flex")
 		})
 
 		creating.WrapSaveFunc(func(in presets.SaveFunc) presets.SaveFunc {

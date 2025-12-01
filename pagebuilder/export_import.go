@@ -30,9 +30,24 @@ func (b *Builder) exportPages(w http.ResponseWriter, r *http.Request) {
 	}
 	ids := strings.Split(idsParam, ",")
 	var pages []Page
-	b.db.Find(&pages, ids)
+	for _, id := range ids {
+		segs := strings.Split(id, "_")
+		if len(segs) < 2 {
+			continue
+		}
+		pageID := segs[0]
+		version := segs[1]
+		tx := b.db.Where("id = ? AND version = ?", pageID, version)
+		if len(segs) > 2 {
+			tx = tx.Where("locale_code = ?", segs[2])
+		}
+		var p Page
+		if err := tx.First(&p).Error; err == nil {
+			pages = append(pages, p)
+		}
+	}
 
-	var exportData []PageExport
+	var exportData = make([]PageExport, 0)
 	for _, p := range pages {
 		var containers []Container
 		b.db.Where("page_id = ? AND page_version = ?", p.ID, p.Version.Version).Order("display_order ASC").Find(&containers)
@@ -69,13 +84,23 @@ func (b *Builder) exportPages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(exportData)
 }
 
+func (b *Builder) exportPagesEvent(ctx *web.EventContext) (r web.EventResponse, err error) {
+	ids := ctx.R.FormValue("ids")
+	if ids == "" {
+		return
+	}
+	url := fmt.Sprintf("%s/export/pages?ids=%s", b.prefix, ids)
+	web.AppendRunScripts(&r, fmt.Sprintf("window.open('%s', '_blank')", url))
+	return
+}
+
 func (b *Builder) importPages(ctx *web.EventContext) (r web.EventResponse, err error) {
 	var (
 		db = b.db
 	)
 
 	if len(ctx.R.MultipartForm.File["ImportFile"]) == 0 {
-		web.AppendRunScripts(&r, `vars.importDialog = false; vars.importFile = null;`)
+		web.AppendRunScripts(&r, `locals.importDialog = false; form.ImportFile = null;`)
 		return
 	}
 
