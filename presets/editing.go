@@ -347,7 +347,7 @@ func (b *EditingBuilder) editFormFor(obj interface{}, ctx *web.EventContext) h.H
 						BeforeScript("xLocals.isFetching=true").
 						EventFunc(actions.Update).
 						Queries(queries).
-						ThenScript("xLocals.isFetching=false;").
+						ThenScript("xLocals.isFetching=false").
 						URL(b.mb.Info().ListingHref()).
 						Go()),
 			).VSlot("{locals:xLocals}").Init("{isFetching:false}")
