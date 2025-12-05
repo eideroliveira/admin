@@ -75,7 +75,7 @@ func primaryColumnValuesBySlug(slug string) map[string]string {
 	}
 
 	_, err := cast.ToInt64E(segs[0])
-	if err != nil {
+	if err != nil && segs[0] != "preview" {
 		panic(presets.ErrNotFound(fmt.Sprintf("wrong slug %q: %v", slug, err)))
 	}
 
@@ -96,7 +96,7 @@ func primaryColumnValuesBySlugWithoutVersion(slug string) map[string]string {
 	}
 
 	_, err := cast.ToInt64E(segs[0])
-	if err != nil {
+	if err != nil && segs[0] != "preview"{
 		panic(presets.ErrNotFound(fmt.Sprintf("wrong slug %q: %v", slug, err)))
 	}
 
