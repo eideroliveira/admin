@@ -271,7 +271,7 @@ func (b *TemplateBuilder) configList() {
 	rowMenu := listing.RowMenu()
 	rowMenu.RowMenuItem("Edit").ComponentFunc(func(_ interface{}, id string, ctx *web.EventContext) h.HTMLComponent {
 		var (
-			pMsgr = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, Messages_en_US).(*presets.Messages)
+			pMsgr = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey,presets.Messages_en_US).(*presets.Messages)
 			mb    = b.tm.mb
 		)
 		if mb.Info().Verifier().Do(presets.PermUpdate).WithReq(ctx.R).IsAllowed() != nil {
