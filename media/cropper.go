@@ -38,7 +38,7 @@ func loadImageCropper(mb *Builder) web.EventFunc {
 			m                     media_library.MediaLibrary
 			db                    = mb.db
 			msgr                  = i18n.MustGetModuleMessages(ctx.R, I18nMediaLibraryKey, Messages_en_US).(*Messages)
-			pMsgr                 = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, Messages_en_US).(*presets.Messages)
+			pMsgr                 = i18n.MustGetModuleMessages(ctx.R, presets.CoreI18nModuleKey, presets.Messages_en_US).(*presets.Messages)
 			field, id, thumb, cfg = getParams(ctx)
 			mediaBox              = &media_library.MediaBox{}
 		)
