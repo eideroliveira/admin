@@ -94,6 +94,10 @@ func (jb *JobBuilder) GetResourceBuilder() *presets.ModelBuilder {
 	return jb.rmb
 }
 
+func (jb *JobBuilder) GetResource() interface{} {
+	return jb.r
+}
+
 func (jb *JobBuilder) Handler(h JobHandler) *JobBuilder {
 	jb.h = h
 	return jb

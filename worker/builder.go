@@ -148,6 +148,10 @@ func (b *Builder) getJobBuilder(name string) *JobBuilder {
 	return nil
 }
 
+func (b *Builder) GetJobBuilder(name string) *JobBuilder {
+	return b.getJobBuilder(name)
+}
+
 func (b *Builder) mustGetJobBuilder(name string) *JobBuilder {
 	jb := b.getJobBuilder(name)
 
