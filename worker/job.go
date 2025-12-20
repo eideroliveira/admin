@@ -197,7 +197,7 @@ func (jb *JobBuilder) newJobInstance(
 		Job:      qorJobName,
 		Status:   JobStatusNew,
 	}
-	if jb.b.getCurrentUserIDFunc != nil {
+	if r != nil && jb.b.getCurrentUserIDFunc != nil {
 		inst.Operator = jb.b.getCurrentUserIDFunc(r)
 	}
 	err := jb.b.db.Create(&inst).Error

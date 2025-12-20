@@ -499,6 +499,36 @@ func (b *Builder) CreateJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, e
 		return b.q.Add(ctx.R.Context(), inst)
 	})
 	return
+	return
+}
+
+// CreateSystemJob creates a job from system background, without web context checks
+func (b *Builder) CreateSystemJob(ctx context.Context, jobName string, args interface{}) (j *QorJob, err error) {
+	jb := b.mustGetJobBuilder(jobName)
+
+	err = b.db.Transaction(func(tx *gorm.DB) error {
+		j = &QorJob{
+			Job:    jobName,
+			Status: JobStatusNew,
+		}
+		if s, ok := args.(Scheduler); ok {
+			if scheduleTime := s.GetScheduleTime(); scheduleTime != nil {
+				j.Status = JobStatusScheduled
+			}
+		}
+
+		err = tx.Create(j).Error
+		if err != nil {
+			return err
+		}
+		var inst *QorJobInstance
+		inst, err = jb.newJobInstance(nil, j.ID, jobName, args, nil)
+		if err != nil {
+			return err
+		}
+		return b.q.Add(ctx, inst)
+	})
+	return
 }
 
 func (b *Builder) eventSelectJob(ctx *web.EventContext) (er web.EventResponse, err error) {
