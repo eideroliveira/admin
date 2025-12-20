@@ -499,7 +499,6 @@ func (b *Builder) CreateJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, e
 		return b.q.Add(ctx.R.Context(), inst)
 	})
 	return
-	return
 }
 
 // CreateSystemJob creates a job from system background, without web context checks
