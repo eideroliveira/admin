@@ -17,6 +17,7 @@ import (
 
 	"github.com/qor5/admin/v3/media/base"
 	"github.com/qor5/admin/v3/media/media_library"
+	"github.com/qor5/admin/v3/media/oss"
 	"github.com/qor5/admin/v3/presets"
 )
 
@@ -207,9 +208,10 @@ func chooseFile(mb *Builder) web.EventFunc {
 			}
 		}
 
+		url, _ := oss.Storage.GetURL(ctx.R.Context(), m.File.Url)
 		mediaBox := media_library.MediaBox{
 			ID:          json.Number(fmt.Sprint(m.ID)),
-			Url:         m.File.Url,
+			Url:         url,
 			VideoLink:   "",
 			FileName:    m.File.FileName,
 			Description: m.File.Description,
@@ -262,7 +264,7 @@ func fileComponent(mb *Builder, field string, tab string, ctx *web.EventContext,
 	croppingVar := fileCroppingVarName(f.ID)
 	*initCroppingVars = append(*initCroppingVars, fmt.Sprintf("%s: false", croppingVar))
 
-	src := f.File.URL()
+	src,_ := oss.Storage.GetURL(ctx.R.Context(), f.File.Url)
 	fullSrc := src
 	if !strings.HasPrefix(fullSrc, "http") {
 		if strings.HasPrefix(src, "//") {
