@@ -114,6 +114,10 @@ func (b *Builder) Queue(q Queue) *Builder {
 	return b
 }
 
+func (b *Builder) GetQueue() Queue {
+	return b.q
+}
+
 func (b *Builder) GetCurrentUserIDFunc(f func(r *http.Request) string) *Builder {
 	b.getCurrentUserIDFunc = f
 	return b

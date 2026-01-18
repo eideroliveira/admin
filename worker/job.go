@@ -264,6 +264,10 @@ func (job *QorJobInstance) GetJobInfo() (ji *JobInfo, err error) {
 	}, nil
 }
 
+func (job *QorJobInstance) SetJobBuilder(jb *JobBuilder) {
+	job.jb = jb
+}
+
 func (job *QorJobInstance) GetStatus() string {
 	return job.Status
 }
