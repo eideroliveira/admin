@@ -30,6 +30,7 @@ type JobBuilder struct {
 	h              JobHandler
 	contextHandler func(*web.EventContext) map[string]interface{} // optional
 	global         bool
+	concurrency    int
 }
 
 func newJob(b *Builder, name string) *JobBuilder {
@@ -41,9 +42,10 @@ func newJob(b *Builder, name string) *JobBuilder {
 	}
 
 	return &JobBuilder{
-		b:      b,
-		name:   name,
-		global: true,
+		b:           b,
+		name:        name,
+		global:      true,
+		concurrency: 1,
 	}
 }
 
@@ -105,6 +107,11 @@ func (jb *JobBuilder) Handler(h JobHandler) *JobBuilder {
 
 func (jb *JobBuilder) ContextHandler(handler func(*web.EventContext) map[string]interface{}) *JobBuilder {
 	jb.contextHandler = handler
+	return jb
+}
+
+func (jb *JobBuilder) Concurrency(n int) *JobBuilder {
+	jb.concurrency = n
 	return jb
 }
 
