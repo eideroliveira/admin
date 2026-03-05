@@ -284,9 +284,12 @@ func (b *Builder) eventActionJobProgressing(ctx *web.EventContext) (er web.Event
 		),
 	)
 
-	if inst.Status == JobStatusDone || inst.Status == JobStatusException {
+	switch inst.Status {
+	case JobStatusDone:
+		er.RunScript = "vars.actionJobProgressingInterval = 0; setTimeout(function(){ vars.presetsDialog = false; location.reload(); }, 1000);"
+	case JobStatusException:
 		er.RunScript = "vars.actionJobProgressingInterval = 0;"
-	} else {
+	default:
 		er.RunScript = fmt.Sprintf("vars.actionJobProgressingInterval = %d;", config.progressingInterval)
 	}
 	return er, nil
