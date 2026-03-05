@@ -249,5 +249,5 @@ func (*ModelBuilder) NewHasUnreadNotesFilterTab(ctx context.Context) (*presets.F
 }
 
 func GetHasUnreadNotesHref(listingHref string) string {
-	return fmt.Sprintf("/%s?active_filter_tab=%s&f_%s=1", listingHref, KeyHasUnreadNotes, KeyHasUnreadNotes)
+	return fmt.Sprintf("/admin/%s?active_filter_tab=%s&f_%s=1", listingHref, KeyHasUnreadNotes, KeyHasUnreadNotes)
 }
