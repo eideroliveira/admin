@@ -38,11 +38,7 @@ func defaultToPage(config commonPageConfig, obj interface{}, ctx *web.EventConte
 				VTabs(
 					VTab(h.Text(msgr.FormTitle)).Value("default"),
 					h.Components(tabs...),
-				).Class("v-tabs--fixed-tabs").Attr("v-model", "locals.tab").
-					Attr("@update:model-value", `function(v) {
-						if (v === 'default') { history.replaceState(null, '', location.pathname + location.search) }
-						else { location.hash = v }
-					}`),
+				).Class("v-tabs--fixed-tabs").Attr("v-model", "locals.tab"),
 
 				VTabsWindow(
 					VTabsWindowItem(
@@ -50,7 +46,7 @@ func defaultToPage(config commonPageConfig, obj interface{}, ctx *web.EventConte
 					).Value("default"),
 					h.Components(contents...),
 				).Attr("v-model", "locals.tab"),
-			).VSlot("{ locals }").Init(`{tab: (location.hash ? location.hash.slice(1) : 'default')}`)
+			).VSlot("{ locals }").Init(`{tab: 'default'}`)
 		}
 	}
 
