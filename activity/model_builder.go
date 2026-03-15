@@ -455,6 +455,13 @@ func (mb *ModelBuilder) Note(ctx context.Context, v any, note *Note) (*ActivityL
 	return mb.Log(ctx, ActionNote, v, note)
 }
 
+// Notify creates an activity log that triggers the unread notification bell.
+// Use this for actionable alerts (new content, overdue orders, etc.).
+// Use Note() for audit-trail entries that should not trigger notifications.
+func (mb *ModelBuilder) Notify(ctx context.Context, v any, note *Note) (*ActivityLog, error) {
+	return mb.Log(ctx, ActionNotification, v, note)
+}
+
 func (mb *ModelBuilder) Diff(oldObj, newObj any) ([]Diff, error) {
 	return NewDiffBuilder(mb).Diff(oldObj, newObj)
 }

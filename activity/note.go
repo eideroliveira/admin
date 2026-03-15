@@ -36,7 +36,7 @@ func getNotesCounts(db *gorm.DB, tablePrefix string, uid string, modelName strin
 	tableName := tablePrefix + s.Table
 
 	args := []any{
-		ActionNote,
+		ActionNotification,
 	}
 
 	var explictWhere string
@@ -107,6 +107,63 @@ func getNotesCounts(db *gorm.DB, tablePrefix string, uid string, modelName strin
 	return counts, nil
 }
 
+func markNotesAsReadForModel(db *gorm.DB, tablePrefix, uid, modelName string) error {
+	s, err := ParseSchemaWithDB(db, &ActivityLog{})
+	if err != nil {
+		return err
+	}
+	tableName := tablePrefix + s.Table
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		var results []struct {
+			ModelName    string
+			ModelKeys    string
+			ModelLabel   string
+			ModelLink    string
+			MaxCreatedAt time.Time
+		}
+		if err := tx.Table(tableName).
+			Select("model_name, model_keys, MAX(model_label) AS model_label, MAX(model_link) AS model_link, MAX(created_at) AS max_created_at").
+			Where("action = ? AND model_name = ? AND deleted_at IS NULL", ActionNotification, modelName).
+			Group("model_name, model_keys").Scan(&results).Error; err != nil {
+			return errors.Wrap(err, "find created_at of last notes")
+		}
+
+		if len(results) <= 0 {
+			return nil
+		}
+
+		if err := tx.Table(tableName).Unscoped().
+			Where("user_id = ? AND action = ? AND model_name = ?", uid, ActionLastView, modelName).
+			Delete(&ActivityLog{}).Error; err != nil {
+			return errors.Wrap(err, "delete last views")
+		}
+
+		var logs []ActivityLog
+		for _, v := range results {
+			log := ActivityLog{
+				UserID:     uid,
+				Action:     ActionLastView,
+				Hidden:     true,
+				ModelName:  v.ModelName,
+				ModelKeys:  v.ModelKeys,
+				ModelLabel: v.ModelLabel,
+				ModelLink:  v.ModelLink,
+				Detail:     "null",
+			}
+			log.CreatedAt = v.MaxCreatedAt
+			log.UpdatedAt = v.MaxCreatedAt
+			logs = append(logs, log)
+		}
+
+		if err := tx.Table(tableName).CreateInBatches(&logs, 1000).Error; err != nil {
+			return errors.Wrap(err, "create new last views")
+		}
+
+		return nil
+	})
+}
+
 func markAllNotesAsRead(db *gorm.DB, uid string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 		var results []struct {
@@ -118,7 +175,7 @@ func markAllNotesAsRead(db *gorm.DB, uid string) error {
 		}
 		if err := tx.Model(&ActivityLog{}).
 			Select("model_name, model_keys, MAX(model_label) AS model_label, MAX(model_link) AS model_link, MAX(created_at) AS max_created_at").
-			Where("action = ?", ActionNote).
+			Where("action = ?", ActionNotification).
 			Group("model_name, model_keys").Scan(&results).Error; err != nil {
 			return errors.Wrap(err, "find created_at of last notes")
 		}
@@ -148,7 +205,7 @@ func markAllNotesAsRead(db *gorm.DB, uid string) error {
 			logs = append(logs, log)
 		}
 
-		if err := tx.Create(logs).Error; err != nil {
+		if err := tx.CreateInBatches(logs, 1000).Error; err != nil {
 			return errors.Wrap(err, "create new last views")
 		}
 
@@ -195,7 +252,7 @@ func sqlConditionHasUnreadNotes(db *gorm.DB, tablePrefix, uid, modelName string,
 	    WHERE n.user_id <> '%s' 
 	        AND (lva.last_viewed_at IS NULL OR n.created_at > lva.last_viewed_at)
 	    GROUP BY n.model_keys
-    )`, a, tableName, ActionNote, modelName, tableName, ActionLastView, uid, modelName, b, uid), nil
+    )`, a, tableName, ActionNotification, modelName, tableName, ActionLastView, uid, modelName, b, uid), nil
 }
 
 func (ab *Builder) GetNotesCounts(ctx context.Context, modelName string, modelKeyses []string, conditions ...presets.SQLCondition) ([]*NoteCount, error) {
@@ -212,6 +269,16 @@ func (ab *Builder) MarkAllNotesAsRead(ctx context.Context) error {
 		return err
 	}
 	return markAllNotesAsRead(ab.db, user.ID)
+}
+
+// MarkNotesAsReadForModel marks all notes as read for the current user,
+// scoped to a specific model name (e.g. "Subscription").
+func (ab *Builder) MarkNotesAsReadForModel(ctx context.Context, modelName string) error {
+	user, err := ab.currentUserFunc(ctx)
+	if err != nil {
+		return err
+	}
+	return markNotesAsReadForModel(ab.db, ab.tablePrefix, user.ID, modelName)
 }
 
 // SQLConditionHasUnreadNotes returns a SQL condition that can be used in a WHERE clause to filter records that have unread notes.

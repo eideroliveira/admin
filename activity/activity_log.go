@@ -13,8 +13,9 @@ const (
 	ActionEdit     = "Edit"
 	ActionCreate   = "Create"
 	ActionDelete   = "Delete"
-	ActionNote     = "Note"
-	ActionLastView = "LastView" // hidden and only for internal use
+	ActionNote         = "Note"
+	ActionNotification = "Notification" // triggers unread bell; Note is audit-only
+	ActionLastView     = "LastView"     // hidden and only for internal use
 )
 
 var DefaultActions = []string{ActionCreate /* ActionView,*/, ActionEdit, ActionDelete, ActionNote}

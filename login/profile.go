@@ -40,6 +40,10 @@ func (b *ProfileBuilder) Install(pb *presets.Builder) error {
 		return b.NewCompo(evCtx, "")
 	})
 
+	if b.notificationClickFunc != nil {
+		pb.GetWebBuilder().RegisterEventFunc(NotificationClickEvent, b.handleNotificationClick)
+	}
+
 	dc := pb.GetDependencyCenter()
 	injectorName := b.injectorName()
 	dc.RegisterInjector(injectorName)
@@ -47,6 +51,23 @@ func (b *ProfileBuilder) Install(pb *presets.Builder) error {
 		return b
 	})
 	return nil
+}
+
+const NotificationClickEvent = "profile_notificationClick"
+
+func (b *ProfileBuilder) handleNotificationClick(ctx *web.EventContext) (r web.EventResponse, err error) {
+	modelName := ctx.R.FormValue("model_name")
+	if b.notificationClickFunc == nil {
+		return
+	}
+	redirectURL, err := b.notificationClickFunc(ctx, modelName)
+	if err != nil {
+		return r, err
+	}
+	if redirectURL != "" {
+		r.RedirectURL = redirectURL
+	}
+	return
 }
 
 type ProfileField struct {
@@ -86,14 +107,17 @@ type ProfileBuilder struct {
 	mu sync.RWMutex
 	pb *presets.Builder
 
-	lsb                 *SessionBuilder
-	logoutURL           string
-	disableNotification bool
-	currentProfileFunc  func(ctx context.Context) (*Profile, error)
-	renameCallback      RenameCallback
-	customizeButtons    func(ctx context.Context, buttons ...h.HTMLComponent) ([]h.HTMLComponent, error)
-	prependCompo        CustomizeCompoFunc
-	subtitleCompo       CustomizeCompoFunc
+	lsb                      *SessionBuilder
+	logoutURL                string
+	disableNotification      bool
+	notificationHrefFunc     func(modelName, modelLabel string) string
+	notificationClickFunc    func(ctx *web.EventContext, modelName string) (redirectURL string, err error)
+	bellCompoFunc            func(ctx context.Context, profile *ProfileCompo, notifCounts []*activity.NoteCount) h.HTMLComponent
+	currentProfileFunc       func(ctx context.Context) (*Profile, error)
+	renameCallback           RenameCallback
+	customizeButtons         func(ctx context.Context, buttons ...h.HTMLComponent) ([]h.HTMLComponent, error)
+	prependCompo             CustomizeCompoFunc
+	subtitleCompo            CustomizeCompoFunc
 }
 
 func NewProfileBuilder(
@@ -121,6 +145,30 @@ func (b *ProfileBuilder) LogoutURL(s string) *ProfileBuilder {
 
 func (b *ProfileBuilder) DisableNotification(v bool) *ProfileBuilder {
 	b.disableNotification = v
+	return b
+}
+
+// NotificationHrefFunc sets a custom function to build the notification link
+// for a given model. If the function returns "", the default admin href is used.
+func (b *ProfileBuilder) NotificationHrefFunc(f func(modelName, modelLabel string) string) *ProfileBuilder {
+	b.notificationHrefFunc = f
+	return b
+}
+
+// NotificationClickFunc sets a callback invoked when a notification item is
+// clicked. It should perform any side-effects (e.g. marking notes as read) and
+// return the URL to redirect to. If set, the notification item fires an event
+// instead of navigating via href directly.
+func (b *ProfileBuilder) NotificationClickFunc(f func(ctx *web.EventContext, modelName string) (redirectURL string, err error)) *ProfileBuilder {
+	b.notificationClickFunc = f
+	return b
+}
+
+// BellCompoFunc replaces the default bell/notification component.
+// When set, NotificationHrefFunc and NotificationClickFunc are ignored
+// (handle links and click behavior inside the custom component instead).
+func (b *ProfileBuilder) BellCompoFunc(f func(ctx context.Context, profile *ProfileCompo, notifCounts []*activity.NoteCount) h.HTMLComponent) *ProfileBuilder {
+	b.bellCompoFunc = f
 	return b
 }
 
@@ -265,9 +313,13 @@ func (c *ProfileCompo) MarshalHTML(ctx context.Context) ([]byte, error) {
 			subtitleCompo,
 		),
 		h.Iff(showBellCompo, func() h.HTMLComponent {
-			return h.Div().Class("d-flex align-center px-4 me-n3 border-s-sm h-50").Children(
-				c.bellCompo(ctx, user.NotifCounts),
-			)
+			var bell h.HTMLComponent
+			if c.b.bellCompoFunc != nil {
+				bell = c.b.bellCompoFunc(ctx, c, user.NotifCounts)
+			} else {
+				bell = c.bellCompo(ctx, user.NotifCounts)
+			}
+			return h.Div().Class("d-flex align-center px-4 me-n3 border-s-sm h-50").Children(bell)
 		}),
 	}...)
 	return stateful.Actionable(ctx, c, web.Scope().VSlot("{ locals: xlocals }").Init("{ userCardVisible: false }").Children(
@@ -298,15 +350,27 @@ func (c *ProfileCompo) bellCompo(ctx context.Context, notifCounts []*activity.No
 			v.VListItemSubtitle(h.Text(msgr.UnreadMessages(lo.SumBy(counts, unreadBy)))),
 		)
 
-		var href string
-		hasModelLabel, ok := lo.Find(counts, func(item *activity.NoteCount) bool {
-			return item.ModelLabel != "" && item.ModelLabel != activity.NopModelLabel
-		})
-		if ok {
-			href = activity.GetHasUnreadNotesHref(hasModelLabel.ModelLabel)
-		}
-		if href != "" {
-			listItem.Href(href)
+		if c.b.notificationClickFunc != nil {
+			listItem.Attr("@click",
+				web.POST().EventFunc(NotificationClickEvent).
+					Query("model_name", modelName).Go(),
+			)
+		} else {
+			var href string
+			hasModelLabel, ok := lo.Find(counts, func(item *activity.NoteCount) bool {
+				return item.ModelLabel != "" && item.ModelLabel != activity.NopModelLabel
+			})
+			if ok {
+				if c.b.notificationHrefFunc != nil {
+					href = c.b.notificationHrefFunc(modelName, hasModelLabel.ModelLabel)
+				}
+				if href == "" {
+					href = activity.GetHasUnreadNotesHref(hasModelLabel.ModelLabel)
+				}
+			}
+			if href != "" {
+				listItem.Href(href)
+			}
 		}
 
 		listItems = append(listItems, listItem)
