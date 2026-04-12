@@ -844,7 +844,7 @@ func (b *Builder) jobProgressing(
 		).Name("worker_hiddenLogs"))
 	}
 	for _, l := range logs {
-		logLines = append(logLines, P().Style(`
+		logLines = append(logLines, P().Attr("v-pre", true).Style(`
     margin: 0;
     margin-bottom: 4px;`).Children(Text(l)))
 	}
@@ -895,7 +895,7 @@ func (b *Builder) jobProgressing(
 		),
 
 		If(progressText != "",
-			Div().Class("mb-3").Children(
+			Div().Class("mb-3").Attr("v-pre", true).Children(
 				RawHTML(progressText),
 			),
 		),

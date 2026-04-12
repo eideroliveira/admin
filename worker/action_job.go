@@ -278,7 +278,7 @@ func (b *Builder) eventActionJobProgressing(ctx *web.EventContext) (er web.Event
 		).ModelValue(int(inst.Progress)).Height(20)).Class("mb-5"),
 		h.If(config.displayLog, actionJobLog(*config.b, inst)),
 		h.If(inst.ProgressText != "",
-			h.Div().Class("mb-3").Children(
+			h.Div().Class("mb-3").Attr("v-pre", true).Children(
 				h.RawHTML(inst.ProgressText),
 			),
 		),
