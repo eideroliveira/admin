@@ -152,8 +152,14 @@ func (b *Builder) getJobBuilder(name string) *JobBuilder {
 	return nil
 }
 
+// GetJobBuilder returns the job builder for the given name, or nil if not found.
 func (b *Builder) GetJobBuilder(name string) *JobBuilder {
 	return b.getJobBuilder(name)
+}
+
+// CreateJob creates and enqueues a job from an EventContext (requires HTTP request).
+func (b *Builder) CreateJob(ctx *web.EventContext, qorJob *QorJob) (*QorJob, error) {
+	return b.createJob(ctx, qorJob)
 }
 
 func (b *Builder) mustGetJobBuilder(name string) *JobBuilder {
@@ -468,7 +474,7 @@ func (b *Builder) Shutdown(ctx context.Context) error {
 	return b.q.Shutdown(ctx)
 }
 
-func (b *Builder) CreateJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, err error) {
+func (b *Builder) createJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, err error) {
 	if err = editIsAllowed(ctx.R, qorJob.Job); err != nil {
 		return
 	}

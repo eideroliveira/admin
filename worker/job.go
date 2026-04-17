@@ -30,7 +30,7 @@ type JobBuilder struct {
 	h              JobHandler
 	contextHandler func(*web.EventContext) map[string]interface{} // optional
 	global         bool
-	concurrency    int
+	concurrency    int // max concurrent instances (0 = unlimited)
 }
 
 func newJob(b *Builder, name string) *JobBuilder {
@@ -50,6 +50,13 @@ func newJob(b *Builder, name string) *JobBuilder {
 }
 
 type JobHandler func(context.Context, QorJobInterface) error
+
+// Concurrency sets the maximum number of concurrent instances for this job.
+// A value of 0 means unlimited (default).
+func (jb *JobBuilder) Concurrency(n int) *JobBuilder {
+	jb.concurrency = n
+	return jb
+}
 
 // r should be ptr to struct
 func (jb *JobBuilder) Resource(r interface{}) *JobBuilder {
@@ -96,6 +103,7 @@ func (jb *JobBuilder) GetResourceBuilder() *presets.ModelBuilder {
 	return jb.rmb
 }
 
+// GetResource returns the resource prototype for this job.
 func (jb *JobBuilder) GetResource() interface{} {
 	return jb.r
 }
@@ -107,11 +115,6 @@ func (jb *JobBuilder) Handler(h JobHandler) *JobBuilder {
 
 func (jb *JobBuilder) ContextHandler(handler func(*web.EventContext) map[string]interface{}) *JobBuilder {
 	jb.contextHandler = handler
-	return jb
-}
-
-func (jb *JobBuilder) Concurrency(n int) *JobBuilder {
-	jb.concurrency = n
 	return jb
 }
 
