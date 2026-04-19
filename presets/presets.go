@@ -982,14 +982,14 @@ func (b *Builder) defaultLayout(in web.PageFunc, cfg *LayoutConfig) (out web.Pag
 			h.Iff(actionsComponentTeleportToID != "", func() h.HTMLComponent {
 				return h.Components(
 					VSpacer(),
-					h.Div().Id(actionsComponentTeleportToID),
+					h.Div().Id(actionsComponentTeleportToID).Class("d-flex flex-wrap justify-end"),
 				)
 			}),
-		).Class("d-flex align-center mx-6 border-b w-100").Style("padding-bottom:24px")
+		).Class("d-flex align-center flex-wrap mx-6 border-b w-100 page-title-bar").Style("padding-bottom:24px")
 		pr.Body = b.defaultLayoutCompo(ctx, b.defaultLeftMenuComp(ctx), h.Components(
 			VAppBar(
 				pageTitleComp,
-			).Elevation(0).Attr("height", 100),
+			).Elevation(0).Attr("height", 100).Class("page-content-app-bar"),
 			innerPr.Body,
 		),
 		)
