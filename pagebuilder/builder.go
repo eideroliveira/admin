@@ -1010,6 +1010,20 @@ func (b *Builder) ContainerByName(name string) (r *ContainerBuilder) {
 	panic(fmt.Sprintf("No container: %s", name))
 }
 
+// FindContainerByName is the non-panicking variant of ContainerByName — it
+// returns nil if no container with the given name is registered. Callers
+// that render content authored in the page builder on public routes should
+// prefer this so a stale DB row for an unregistered container type does
+// not crash the request.
+func (b *Builder) FindContainerByName(name string) *ContainerBuilder {
+	for _, cb := range b.containerBuilders {
+		if cb.name == name {
+			return cb
+		}
+	}
+	return nil
+}
+
 type ContainerBuilder struct {
 	builder      *Builder
 	name         string
@@ -1224,6 +1238,14 @@ func (b *ContainerBuilder) warpSaver() {
 func (b *ContainerBuilder) RenderFunc(v RenderFunc) *ContainerBuilder {
 	b.renderFunc = v
 	return b
+}
+
+// GetRenderFunc returns the registered render function so callers outside
+// the pagebuilder (e.g. a public route that wants to render a page's
+// containers itself) can dispatch without duplicating the model-name to
+// body-function mapping.
+func (b *ContainerBuilder) GetRenderFunc() RenderFunc {
+	return b.renderFunc
 }
 
 func (b *ContainerBuilder) Cover(v string) *ContainerBuilder {
