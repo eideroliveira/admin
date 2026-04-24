@@ -617,8 +617,15 @@ func (b *ModelBuilder) renderContainers(ctx *web.EventContext, obj interface{}, 
 			Obj:         obj,
 		}
 		pure := ec.builder.renderFunc(containerObj, &input, ctx)
-
-		r = append(r, b.builder.containerWrapper(pure.(*h.HTMLTagBuilder), ctx, isEditor, isReadonly, i == 0, i == len(cbs)-1,
+		tag, ok := pure.(*h.HTMLTagBuilder)
+		if !ok || tag == nil {
+			// A render func that returns nil (or a non-tag component)
+			// would panic the type assertion below and crash the whole
+			// editor / preview. Substitute an invisible placeholder so
+			// the surrounding container chrome still renders.
+			tag = h.Div().Style("display:none")
+		}
+		r = append(r, b.builder.containerWrapper(tag, ctx, isEditor, isReadonly, i == 0, i == len(cbs)-1,
 			ec.builder.getContainerDataID(int(ec.container.ModelID), ec.container.PrimarySlug()), ec.container.ModelName, &input))
 	}
 
@@ -673,7 +680,15 @@ func (b *ModelBuilder) renderPreviewContainer(ctx *web.EventContext, obj interfa
 		return
 	}
 	pure := containerBuilder.renderFunc(containerObj, &input, ctx)
-	r = b.builder.containerWrapper(pure.(*h.HTMLTagBuilder), ctx, isEditor, IsReadonly, false, false,
+	tag, ok := pure.(*h.HTMLTagBuilder)
+	if !ok || tag == nil {
+		// Same nil guard as renderContainers — a container RenderFunc
+		// that returns nil in the palette preview (e.g. CTAButton with
+		// no product selected, published mode) must not crash the
+		// editor.
+		tag = h.Div().Style("display:none")
+	}
+	r = b.builder.containerWrapper(tag, ctx, isEditor, IsReadonly, false, false,
 		containerBuilder.getContainerDataID(modelID, ""), modelName, &input)
 	return
 }
