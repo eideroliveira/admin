@@ -1222,6 +1222,9 @@ func (b *ContainerBuilder) GetModelBuilder() *presets.ModelBuilder {
 func (b *ContainerBuilder) warpSaver() {
 	b.mb.Editing().WrapSaveFunc(func(in presets.SaveFunc) presets.SaveFunc {
 		return func(obj interface{}, id string, ctx *web.EventContext) (err error) {
+			if id == "" {
+				return in(obj, id, ctx)
+			}
 			var demo *DemoContainer
 			db := b.builder.db
 			db.Where("model_name = ? and model_id = ? ", b.name, id).First(&demo)
