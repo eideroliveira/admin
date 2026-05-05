@@ -885,6 +885,7 @@ func (b *Builder) defaultLeftMenuComp(ctx *web.EventContext) h.HTMLComponent {
 		// Clipped(true).
 		// Fixed(true).
 		Attr("v-model", "vars.navDrawer").
+		Attr("@update:model-value", `vars.__window.localStorage.setItem("gordpress.navDrawer", $event ? "1" : "0")`).
 		// Attr("style", "border-right: 1px solid grey ").
 		Permanent(true).
 		Floating(true).
@@ -928,8 +929,10 @@ func (b *Builder) defaultLayoutCompo(_ *web.EventContext, menu, body h.HTMLCompo
 				Attr("style", "height:100vh; padding-left: calc(var(--v-layout-left) + 16px); --v-layout-right: 16px"),
 		),
 	).Attr("id", "vt-app").Elevation(0).
-		Attr(web.VAssign("vars", fmt.Sprintf(`{presetsRightDrawer: false, presetsDialog: false, presetsListingDialog: false, 
-navDrawer: true,%s:{},presetsMessage: {show: false, color: "", message: ""}
+		// Attr(web.VAssign("vars", fmt.Sprintf(`{presetsRightDrawer: false, presetsDialog: false, presetsListingDialog: false,
+		// navDrawer: true,%s:{},presetsMessage: {show: false, color: "", message: ""}
+		Attr(web.VAssign("vars", fmt.Sprintf(`{presetsRightDrawer: false, presetsDialog: false, presetsListingDialog: false,
+			navDrawer: vars.__window.localStorage.getItem("gordpress.navDrawer") !== "0",%s:{},presetsMessage: {show: false, color: "", message: ""}
 }`, VarsPresetsDataChanged))...).Class(b.containerClassName)
 }
 
