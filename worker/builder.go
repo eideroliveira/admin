@@ -653,8 +653,11 @@ func (b *Builder) eventRerunJob(ctx *web.EventContext) (er web.EventResponse, er
 	if err != nil {
 		return er, err
 	}
-	if old.Status != JobStatusDone {
-		return er, errors.New("job is not done")
+	// The Rerun button is rendered for both done and failed (exception) jobs,
+	// so the handler must accept either — otherwise rerunning a failed job
+	// returns an error, which executeEvent turns into a panic.
+	if old.Status != JobStatusDone && old.Status != JobStatusException {
+		return er, errors.New("job is not done or failed")
 	}
 
 	inst, err := jb.newJobInstance(ctx.R, qorJobID, qorJobName, old.Args, old.Context)
