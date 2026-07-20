@@ -2,6 +2,7 @@ package presets
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -11,8 +12,10 @@ import (
 
 	"github.com/qor5/web/v3"
 	"github.com/qor5/x/v3/hook"
+	"github.com/qor5/x/v3/perm"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	h "github.com/theplant/htmlgo"
 )
 
 func TestIsMenuItemActive(t *testing.T) {
@@ -66,6 +69,45 @@ func TestIsMenuItemActive(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestMenuGroupDeniedDoesNotLeakChildren guards against a regression where a
+// model listed under a menu group would spill out as a flat top-level item
+// whenever the current user lacked permission for the group itself (mg_<group>)
+// but still had permission for the individual model. buildMenuGroup returns nil
+// for a permission-denied group without recording its subitems, and
+// buildUnorderedMenus used to re-surface any un-recorded model — producing an
+// orphaned flat menu entry instead of hiding it with its group.
+func TestMenuGroupDeniedDoesNotLeakChildren(t *testing.T) {
+	type Report struct{ ID uint } // uriName -> "reports"
+
+	render := func(pb *Builder) string {
+		pb.Model(&Report{})
+		pb.MenuOrder(
+			pb.MenuGroup("Reports").SubItems("reports").Icon("mdi-chart-bar"),
+		)
+		ctx := &web.EventContext{R: httptest.NewRequest("GET", "/", http.NoBody)}
+		comp := pb.menuOrder.CreateMenus(ctx)
+		var buf bytes.Buffer
+		require.NoError(t, h.Fprint(&buf, comp, context.Background()))
+		return buf.String()
+	}
+
+	// Baseline: no permission builder -> everything allowed. The group renders
+	// and the child is reachable.
+	allowed := render(New())
+	assert.Contains(t, allowed, "Report", "child should render when the group is visible")
+
+	// Group permission denied, model permission still allowed: the child must
+	// NOT leak out as a flat top-level item.
+	denied := render(New().Permission(
+		perm.New().Policies(
+			perm.PolicyFor("*").WhoAre(perm.Allowed).ToDo(PermList, PermGet).On("*"),
+			perm.PolicyFor("*").WhoAre(perm.Denied).ToDo(perm.Anything).On("*:mg_reports", "*:mg_reports:*"),
+		),
+	))
+	assert.NotContains(t, denied, "Report",
+		"a model whose menu group is permission-denied must not leak out as a flat top-level item")
 }
 
 func TestLookUpModelBuilder(t *testing.T) {

@@ -70,11 +70,20 @@ func (b *MenuOrderBuilder) Append(items ...interface{}) {
 	}
 }
 
-func (b *MenuOrderBuilder) check(item string, groupName string, ctx *web.EventContext) (*ModelBuilder, bool) {
+// resolveModel maps a menu-order name to its registered model, applying the
+// same normalization as check (exact match, then pluralized-kebab fallback)
+// but WITHOUT the permission / notInMenu gate. Used to know which models are
+// referenced by MenuOrder regardless of whether the current user may see them.
+func (b *MenuOrderBuilder) resolveModel(item string) (*ModelBuilder, bool) {
 	m, ok := b.modelMap[item]
 	if !ok {
 		m, ok = b.modelMap[inflection.Plural(strcase.ToKebab(item))]
 	}
+	return m, ok
+}
+
+func (b *MenuOrderBuilder) check(item string, groupName string, ctx *web.EventContext) (*ModelBuilder, bool) {
+	m, ok := b.resolveModel(item)
 	if !ok {
 		return nil, false
 	}
@@ -85,12 +94,38 @@ func (b *MenuOrderBuilder) check(item string, groupName string, ctx *web.EventCo
 	return m, true
 }
 
+// referencedModelNames collects the uriName of every model referenced by
+// MenuOrder — both top-level string items and menu-group subitems — regardless
+// of permissions. buildUnorderedMenus uses this so that a model whose group is
+// hidden (e.g. the user lacks the mg_<group> permission) is not re-surfaced as
+// a flat top-level item. Only models never mentioned in MenuOrder at all are
+// treated as genuinely "unordered".
+func (b *MenuOrderBuilder) referencedModelNames() map[string]struct{} {
+	referenced := make(map[string]struct{})
+	mark := func(name string) {
+		if m, ok := b.resolveModel(name); ok {
+			referenced[m.uriName] = struct{}{}
+		}
+	}
+	for _, om := range b.order {
+		switch v := om.(type) {
+		case string:
+			mark(v)
+		case *MenuGroupBuilder:
+			for _, sub := range v.subMenuItems {
+				mark(sub)
+			}
+		}
+	}
+	return referenced
+}
+
 func (b *MenuOrderBuilder) CreateMenus(ctx *web.EventContext) h.HTMLComponent {
 	b.initializeModelMap()
 
 	inOrderMap := make(map[string]menuOrderItem)
 	menus := b.buildOrderedMenus(ctx, inOrderMap)
-	unorderedMenus := b.buildUnorderedMenus(ctx, inOrderMap)
+	unorderedMenus := b.buildUnorderedMenus(ctx, inOrderMap, b.referencedModelNames())
 
 	menus = append(menus, unorderedMenus...)
 
@@ -130,10 +165,17 @@ func (b *MenuOrderBuilder) buildOrderedMenus(ctx *web.EventContext, inOrderMap m
 	return menus
 }
 
-func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem) []h.HTMLComponent {
+func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem, referenced map[string]struct{}) []h.HTMLComponent {
 	var menus []h.HTMLComponent
 
 	for _, m := range b.p.models {
+		// Skip any model referenced by MenuOrder — even when its group was
+		// suppressed (permission-denied or empty), it must not leak out as a
+		// flat top-level item. Only models never listed in MenuOrder are
+		// surfaced here.
+		if _, exists := referenced[m.uriName]; exists {
+			continue
+		}
 		if _, exists := inOrderMap[m.uriName]; exists {
 			continue
 		}
