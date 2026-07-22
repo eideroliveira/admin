@@ -12,7 +12,6 @@ import (
 
 	"github.com/qor5/web/v3"
 	"github.com/qor5/x/v3/i18n"
-	"github.com/qor5/x/v3/perm"
 	. "github.com/qor5/x/v3/ui/vuetify"
 	"github.com/sunfmin/reflectutils"
 	h "github.com/theplant/htmlgo"
@@ -1010,7 +1009,7 @@ func (b *SectionBuilder) EditDetailField(ctx *web.EventContext) (r web.EventResp
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -1058,7 +1057,7 @@ func (b *SectionBuilder) SaveDetailField(ctx *web.EventContext) (r web.EventResp
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 	vErrSetter := b.editingFB.Unmarshal(obj, b.mb.Info(), true, ctx)
@@ -1113,11 +1112,12 @@ func (b *SectionBuilder) SaveDetailField(ctx *web.EventContext) (r web.EventResp
 		}
 	}
 
-	if _, ok := ctx.Flash.(*web.ValidationErrors); ok {
+	if vErr, ok := ctx.Flash.(*web.ValidationErrors); ok && vErr.HaveErrors() {
 		r.UpdatePortals = append(r.UpdatePortals, &web.PortalUpdate{
 			Name: b.FieldPortalName(),
 			Body: b.editComponent(obj, field, ctx),
 		})
+		web.AppendRunScripts(&r, ScrollToFirstErrorScript(b.FieldPortalName()))
 		return
 	}
 
@@ -1177,7 +1177,7 @@ func (b *SectionBuilder) ValidateDetailField(ctx *web.EventContext) (r web.Event
 	}
 	vErrSetter := vErr
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		vErr.GlobalError(perm.PermissionDenied.Error())
+		vErr.GlobalError(MustGetMessages(ctx.R).PermissionDenied)
 		return
 	}
 	if b.validator != nil {
@@ -1217,7 +1217,7 @@ func (b *SectionBuilder) EditDetailListField(ctx *web.EventContext) (r web.Event
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -1271,7 +1271,7 @@ func (b *SectionBuilder) SaveDetailListField(ctx *web.EventContext) (r web.Event
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -1386,7 +1386,7 @@ func (b *SectionBuilder) DeleteDetailListField(ctx *web.EventContext) (r web.Eve
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -1441,7 +1441,7 @@ func (b *SectionBuilder) CreateDetailListField(ctx *web.EventContext) (r web.Eve
 	}
 
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 

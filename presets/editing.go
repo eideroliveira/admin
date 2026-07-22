@@ -197,7 +197,7 @@ func (b *EditingBuilder) WrapIdCurrentActive(w func(in IdCurrentActiveProcessor)
 
 func (b *EditingBuilder) formNew(ctx *web.EventContext) (r web.EventResponse, err error) {
 	if b.mb.Info().Verifier().Do(PermCreate).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -215,7 +215,7 @@ func (b *EditingBuilder) formNew(ctx *web.EventContext) (r web.EventResponse, er
 
 func (b *EditingBuilder) formEdit(ctx *web.EventContext) (r web.EventResponse, err error) {
 	if b.mb.Info().Verifier().Do(PermGet).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 	if b.idCurrentActiveProcessor != nil {
@@ -325,11 +325,23 @@ func (b *EditingBuilder) editFormFor(obj interface{}, ctx *web.EventContext) h.H
 			}
 		}
 		if text != "" {
+			// Success messages auto-dismiss; error notices stay until the user closes
+			// them, so a save failure is never missed by someone scrolled away from it.
+			timeout := 2000
+			var closeBtn h.HTMLComponent
+			if color == "error" {
+				timeout = -1
+				closeBtn = web.Slot(
+					VBtn("").Icon("mdi-close").Variant(VariantText).Size(SizeSmall).
+						Attr("@click", "locals.show = false"),
+				).Name("actions")
+			}
 			notice = web.Scope(
 				VSnackbar(
 					h.Div().Style("white-space: pre-wrap").Text(fmt.Sprintf(`{{ %q }}`, text)),
+					closeBtn,
 				).Location("top").
-					Timeout(2000).
+					Timeout(timeout).
 					Color(color).
 					Attr("v-model", "locals.show"),
 			).VSlot("{ locals }").Init(`{ show: true }`)
@@ -468,7 +480,7 @@ func (b *EditingBuilder) doValidate(ctx *web.EventContext) (r web.EventResponse,
 	}
 	vErrSetter := vErr
 	if b.mb.Info().Verifier().Do(PermUpdate).ObjectOn(obj).WithReq(ctx.R).IsAllowed() != nil {
-		vErr.GlobalError(perm.PermissionDenied.Error())
+		vErr.GlobalError(MustGetMessages(ctx.R).PermissionDenied)
 		return
 	}
 	if usingB.Validator != nil {
@@ -481,7 +493,7 @@ func (b *EditingBuilder) doValidate(ctx *web.EventContext) (r web.EventResponse,
 
 func (b *EditingBuilder) doDelete(ctx *web.EventContext) (r web.EventResponse, err1 error) {
 	if b.mb.Info().Verifier().Do(PermDelete).WithReq(ctx.R).IsAllowed() != nil {
-		ShowMessage(&r, perm.PermissionDenied.Error(), "warning")
+		ShowMessage(&r, MustGetMessages(ctx.R).PermissionDenied, "warning")
 		return
 	}
 
@@ -670,7 +682,11 @@ func (b *EditingBuilder) UpdateOverlayContent(
 	if err != nil {
 		if _, ok := err.(*web.ValidationErrors); !ok {
 			vErr := &web.ValidationErrors{}
-			vErr.GlobalError(err.Error())
+			msg := err.Error()
+			if errors.Is(err, perm.PermissionDenied) {
+				msg = MustGetMessages(ctx.R).PermissionDenied
+			}
+			vErr.GlobalError(msg)
 			ctx.Flash = vErr
 		}
 	}
@@ -695,6 +711,10 @@ func (b *EditingBuilder) UpdateOverlayContent(
 		Name: p,
 		Body: b.editFormFor(obj, ctx),
 	})
+
+	if vErr, ok := ctx.Flash.(*web.ValidationErrors); ok && vErr.HaveErrors() {
+		web.AppendRunScripts(r, ScrollToFirstErrorScript(p))
+	}
 }
 
 func (b *EditingBuilder) Section(sections ...*SectionBuilder) *EditingBuilder {

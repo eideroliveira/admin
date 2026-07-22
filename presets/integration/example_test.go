@@ -1,14 +1,15 @@
 package integration_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
 	"testing"
 
 	. "github.com/qor5/web/v3/multipartestutils"
+	"github.com/qor5/x/v3/gormx"
 	"github.com/theplant/gofixtures"
-	"github.com/theplant/testenv"
 	"gorm.io/gorm"
 
 	"github.com/qor5/admin/v3/presets"
@@ -19,12 +20,14 @@ import (
 var TestDB *gorm.DB
 
 func TestMain(m *testing.M) {
-	env, err := testenv.New().DBEnable(true).SetUp()
-	if err != nil {
-		panic(err)
-	}
-	defer env.TearDown()
-	TestDB = env.DB
+	ctx := context.Background()
+	testSuite := gormx.MustStartTestSuite(ctx)
+	defer func() {
+		if err := testSuite.Stop(context.Background()); err != nil {
+			fmt.Printf("Error during teardown: %v\n", err)
+		}
+	}()
+	TestDB = testSuite.DB()
 	m.Run()
 }
 
@@ -72,6 +75,36 @@ func TestExample(t *testing.T) {
 					t.Error(u)
 				}
 			},
+		},
+		{
+			Name: "Update with validation error scrolls to first error field",
+			ReqFunc: func() *http.Request {
+				customerData.TruncatePut(dbr)
+				return NewMultipartBuilder().
+					PageURL("/admin/my_customers").
+					EventFunc(actions.Update).
+					Query(presets.ParamID, "11").
+					AddField("ID", "11").
+					AddField("Name", "abc"). // < 5 chars, fails the ValidateFunc
+					BuildEventFuncRequest()
+			},
+			ExpectPortalUpdate0ContainsInOrder: []string{"input more than 5 chars"},
+			ExpectRunScriptContainsInOrder:     []string{"scrollIntoView"},
+		},
+		{
+			Name: "Update with validation error shows a persistent error notice",
+			ReqFunc: func() *http.Request {
+				customerData.TruncatePut(dbr)
+				return NewMultipartBuilder().
+					PageURL("/admin/my_customers").
+					EventFunc(actions.Update).
+					Query(presets.ParamID, "11").
+					AddField("ID", "11").
+					AddField("Name", "abc").
+					BuildEventFuncRequest()
+			},
+			// error notice must not auto-dismiss (persistent) and stays closable.
+			ExpectPortalUpdate0ContainsInOrder: []string{":timeout='-1'", "there are some errors"},
 		},
 		{
 			Name: "Create",
