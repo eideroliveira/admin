@@ -884,13 +884,43 @@ func (b *Builder) defaultLeftMenuComp(ctx *web.EventContext) h.HTMLComponent {
 		// App(true).
 		// Clipped(true).
 		// Fixed(true).
+		// Persistence of the open/closed state lives in the
+		// navDrawerPersistScript watcher on the layout root, not in an
+		// @update:model-value expression: Vue's template compiler
+		// rewrites bare `window`/`localStorage` in a template expression
+		// to _ctx.* (undefined), so browser storage may only be touched
+		// from a lifecycle-directive callback that receives the real
+		// window.
 		Attr("v-model", "vars.navDrawer").
-		Attr("@update:model-value", `vars.__window.localStorage.setItem("gordpress.navDrawer", $event ? "1" : "0")`).
 		// Attr("style", "border-right: 1px solid grey ").
 		Permanent(true).
 		Floating(true).
 		Elevation(0)
 }
+
+// navDrawerPersistScript is the `v-on-mounted` callback attached to the
+// default layout root. It restores the nav drawer's open/closed state
+// from localStorage and keeps it in sync from then on.
+//
+// This cannot be a plain template expression: Vue's template compiler
+// rewrites bare identifiers like `window` and `localStorage` to _ctx.*
+// (undefined at runtime), and the root component deliberately exposes no
+// escape hatch onto the real window. The lifecycle directive
+// (web/corejs/src/lifecycle.ts) hands the callback the real `window`
+// plus a `watch` helper whose teardown is tied to the element, so
+// storage access stays inside the one place that legitimately has it.
+//
+// The VAssign default (`navDrawer: true`) applies at mount, *before*
+// this hook runs, so an explicitly persisted "0" still wins.
+const navDrawerPersistScript = `({window, watch}) => {
+	try {
+		const stored = window.localStorage.getItem("gordpress.navDrawer")
+		if (stored !== null) { vars.navDrawer = stored !== "0" }
+	} catch (e) {}
+	watch(() => vars.navDrawer, (val) => {
+		try { window.localStorage.setItem("gordpress.navDrawer", val ? "1" : "0") } catch (e) {}
+	})
+}`
 
 func (b *Builder) defaultLayoutCompo(_ *web.EventContext, menu, body h.HTMLComponent) h.HTMLComponent {
 	return VCard(
@@ -929,11 +959,11 @@ func (b *Builder) defaultLayoutCompo(_ *web.EventContext, menu, body h.HTMLCompo
 				Attr("style", "height:100vh; padding-left: calc(var(--v-layout-left) + 16px); --v-layout-right: 16px"),
 		),
 	).Attr("id", "vt-app").Elevation(0).
-		// Attr(web.VAssign("vars", fmt.Sprintf(`{presetsRightDrawer: false, presetsDialog: false, presetsListingDialog: false,
-		// navDrawer: true,%s:{},presetsMessage: {show: false, color: "", message: ""}
 		Attr(web.VAssign("vars", fmt.Sprintf(`{presetsRightDrawer: false, presetsDialog: false, presetsListingDialog: false,
-			navDrawer: vars.__window.localStorage.getItem("gordpress.navDrawer") !== "0",%s:{},presetsMessage: {show: false, color: "", message: ""}
-}`, VarsPresetsDataChanged))...).Class(b.containerClassName)
+			navDrawer: true,%s:{},presetsMessage: {show: false, color: "", message: ""}
+}`, VarsPresetsDataChanged))...).
+		Attr("v-on-mounted", navDrawerPersistScript).
+		Class(b.containerClassName)
 }
 
 func (b *Builder) defaultLayout(in web.PageFunc, cfg *LayoutConfig) (out web.PageFunc) {
