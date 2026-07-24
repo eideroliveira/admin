@@ -165,7 +165,13 @@ func getModelQorJobInstance(db *gorm.DB, qorJobID uint) (*QorJobInstance, error)
 }
 
 func (jb *JobBuilder) getJobInstance(qorJobID uint) (*QorJobInstance, error) {
-	inst, err := getModelQorJobInstance(jb.b.db, qorJobID)
+	return jb.getJobInstanceWithDB(jb.b.db, qorJobID)
+}
+
+// getJobInstanceWithDB is getJobInstance on an explicit db, which may be a
+// transaction that has not committed yet.
+func (jb *JobBuilder) getJobInstanceWithDB(db *gorm.DB, qorJobID uint) (*QorJobInstance, error) {
+	inst, err := getModelQorJobInstance(db, qorJobID)
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +182,23 @@ func (jb *JobBuilder) getJobInstance(qorJobID uint) (*QorJobInstance, error) {
 }
 
 func (jb *JobBuilder) newJobInstance(
+	r *http.Request,
+	qorJobID uint,
+	qorJobName string,
+	args interface{},
+	context interface{},
+) (*QorJobInstance, error) {
+	return jb.newJobInstanceWithDB(jb.b.db, r, qorJobID, qorJobName, args, context)
+}
+
+// newJobInstanceWithDB creates the instance on db, which callers that also
+// create the parent QorJob pass as their transaction. Writing the instance on
+// the builder's own connection instead would leave it committed when that
+// transaction rolls back: the qor_jobs row disappears, nothing ever enqueues
+// the instance, and it sits at "new" forever while every listing reports it as
+// queued.
+func (jb *JobBuilder) newJobInstanceWithDB(
+	db *gorm.DB,
 	r *http.Request,
 	qorJobID uint,
 	qorJobName string,
@@ -214,12 +237,12 @@ func (jb *JobBuilder) newJobInstance(
 	if r != nil && jb.b.getCurrentUserIDFunc != nil {
 		inst.Operator = jb.b.getCurrentUserIDFunc(r)
 	}
-	err := jb.b.db.Create(&inst).Error
+	err := db.Create(&inst).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return jb.getJobInstance(qorJobID)
+	return jb.getJobInstanceWithDB(db, qorJobID)
 }
 
 type QueJobInterface interface {

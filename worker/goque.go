@@ -29,6 +29,11 @@ const (
 	// workerHealthyRunTime is how long a worker must stay up before its next
 	// failure is treated as fresh rather than as part of a crash loop.
 	workerHealthyRunTime = time.Minute
+	// jobLookupMaxRetries/jobLookupRetryInterval bound how long a worker keeps
+	// redelivering an entry whose qor_job rows it cannot find, before treating
+	// them as genuinely gone rather than not yet committed.
+	jobLookupMaxRetries    = 5
+	jobLookupRetryInterval = 3 * time.Second
 )
 
 type goque struct {
@@ -148,6 +153,17 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 						}
 						job, err = getJob(uint(id))
 						if err != nil {
+							// The qor_job rows this entry points at are written on
+							// another connection, so a lookup can miss one that is
+							// merely not committed yet. Plans carry no retry policy,
+							// which makes every returned error final — and an expired
+							// entry is never redelivered, leaving the instance at
+							// "new" forever. Give the writer a few seconds first.
+							if qj.RetryCount() < jobLookupMaxRetries {
+								if rerr := qj.RetryAfter(ctx, jobLookupRetryInterval, err); rerr == nil {
+									return nil
+								}
+							}
 							return err
 						}
 					}

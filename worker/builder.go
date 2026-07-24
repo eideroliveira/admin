@@ -19,6 +19,7 @@ import (
 	"github.com/qor5/x/v3/ui/vuetifyx"
 	. "github.com/theplant/htmlgo"
 	"github.com/tnclong/go-que/pg"
+	"go.uber.org/multierr"
 	"golang.org/x/text/language"
 	"gorm.io/gorm"
 
@@ -507,29 +508,58 @@ func (b *Builder) createJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, e
 		}
 	}
 
+	var inst *QorJobInstance
 	err = b.db.Transaction(func(tx *gorm.DB) error {
 		j = &QorJob{
 			Job:    qorJob.Job,
 			Status: JobStatusNew,
 		}
-		err = tx.Create(j).Error
-		if err != nil {
+		if err := tx.Create(j).Error; err != nil {
 			return err
 		}
-		var inst *QorJobInstance
-		inst, err = jb.newJobInstance(ctx.R, j.ID, qorJob.Job, args, context)
-		if err != nil {
-			return err
-		}
-		return b.q.Add(ctx.R.Context(), inst)
+		inst, err = jb.newJobInstanceWithDB(tx, ctx.R, j.ID, qorJob.Job, args, context)
+		return err
 	})
-	return
+	if err != nil {
+		return nil, err
+	}
+	if err = b.enqueue(ctx.R.Context(), j, inst); err != nil {
+		return nil, err
+	}
+	return j, nil
+}
+
+// enqueue hands a committed job instance to the queue. It runs after the
+// creating transaction, never inside it: the queue keeps its own connection
+// (its own pool, even), so an entry added mid-transaction is visible to
+// workers before — or, on a rollback, without — the rows it points at, and the
+// worker that locks it first finds no job and expires the entry for good.
+//
+// A queue that refuses the job leaves an instance nothing will ever run, so
+// mark it failed rather than let it sit at "new" and read as queued forever.
+func (b *Builder) enqueue(ctx context.Context, j *QorJob, inst *QorJobInstance) error {
+	err := b.q.Add(ctx, inst)
+	if err == nil {
+		return nil
+	}
+	errs := err
+	if serr := inst.SetProgressText(fmt.Sprintf("failed to enqueue job: %s", err)); serr != nil {
+		errs = multierr.Append(errs, serr)
+	}
+	if serr := inst.SetStatus(JobStatusException); serr != nil {
+		errs = multierr.Append(errs, serr)
+	}
+	if serr := b.setStatus(j.ID, JobStatusException); serr != nil {
+		errs = multierr.Append(errs, serr)
+	}
+	return errs
 }
 
 // CreateSystemJob creates a job from system background, without web context checks
 func (b *Builder) CreateSystemJob(ctx context.Context, jobName string, args interface{}) (j *QorJob, err error) {
 	jb := b.mustGetJobBuilder(jobName)
 
+	var inst *QorJobInstance
 	err = b.db.Transaction(func(tx *gorm.DB) error {
 		j = &QorJob{
 			Job:    jobName,
@@ -541,18 +571,19 @@ func (b *Builder) CreateSystemJob(ctx context.Context, jobName string, args inte
 			}
 		}
 
-		err = tx.Create(j).Error
-		if err != nil {
+		if err := tx.Create(j).Error; err != nil {
 			return err
 		}
-		var inst *QorJobInstance
-		inst, err = jb.newJobInstance(nil, j.ID, jobName, args, nil)
-		if err != nil {
-			return err
-		}
-		return b.q.Add(ctx, inst)
+		inst, err = jb.newJobInstanceWithDB(tx, nil, j.ID, jobName, args, nil)
+		return err
 	})
-	return
+	if err != nil {
+		return nil, err
+	}
+	if err = b.enqueue(ctx, j, inst); err != nil {
+		return nil, err
+	}
+	return j, nil
 }
 
 func (b *Builder) eventSelectJob(ctx *web.EventContext) (er web.EventResponse, err error) {
