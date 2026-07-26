@@ -951,11 +951,7 @@ func (b *Builder) jobProgressing(
 			logLines...,
 		),
 
-		If(progressText != "",
-			Div().Class("mb-3").Attr("v-pre", true).Children(
-				RawHTML(progressText),
-			),
-		),
+		progressTextDisplay(progressText),
 
 		If(canEdit,
 			Div().Class("d-flex mt-3").Children(

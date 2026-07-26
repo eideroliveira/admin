@@ -277,11 +277,7 @@ func (b *Builder) eventActionJobProgressing(ctx *web.EventContext) (er web.Event
 			h.Strong(fmt.Sprintf("%d%%", inst.Progress)),
 		).ModelValue(int(inst.Progress)).Height(20)).Class("mb-5"),
 		h.If(config.displayLog, actionJobLog(*config.b, inst)),
-		h.If(inst.ProgressText != "",
-			h.Div().Class("mb-3").Attr("v-pre", true).Children(
-				h.RawHTML(inst.ProgressText),
-			),
-		),
+		progressTextDisplay(inst.ProgressText),
 	)
 
 	switch inst.Status {
@@ -293,6 +289,22 @@ func (b *Builder) eventActionJobProgressing(ctx *web.EventContext) (er web.Event
 		er.RunScript = fmt.Sprintf("vars.actionJobProgressingInterval = %d;", config.progressingInterval)
 	}
 	return er, nil
+}
+
+// progressTextDisplay renders a job instance's progress text in the detail
+// view and in the action-job dialog.
+//
+// The text is escaped, never RawHTML. Job handlers assemble it from data they
+// do not control — file names inside an uploaded package, messages from a
+// remote API — so injecting it raw makes any such name stored XSS against the
+// operator watching the run. The v-pre wrapper only stops Vue from compiling
+// mustaches in it; the browser still parses HTML.
+func progressTextDisplay(progressText string) h.HTMLComponent {
+	return h.If(progressText != "",
+		h.Div().Class("mb-3").Attr("v-pre", true).Children(
+			h.Text(progressText),
+		),
+	)
 }
 
 func actionJobLog(b Builder, inst *QorJobInstance) h.HTMLComponent {
