@@ -56,6 +56,46 @@ func TestProgressTextDisplayEscapes(t *testing.T) {
 	}
 }
 
+// TestJobLogLineIsInert covers the other half of the same data path: job logs
+// carry the same uncontrolled names the progress text does. Escaping alone is
+// not enough here, because go-plaid compiles the response body as a Vue
+// template — three of the four log render sites were missing v-pre, so a
+// mustache in a log line was evaluated as an expression rather than shown.
+func TestJobLogLineIsInert(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		log     string
+		wantNot string
+	}{
+		{
+			name:    "html is escaped",
+			log:     `traduzindo licao<img src=x onerror=alert(1)>.pdf`,
+			wantNot: "<img",
+		},
+		{
+			name:    "vue expression is not evaluated",
+			log:     `traduzindo {{constructor.constructor('alert(1)')()}}.pdf`,
+			wantNot: "",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			out, err := jobLogLine(tc.log).MarshalHTML(context.Background())
+			if err != nil {
+				t.Fatalf("marshal html: %v", err)
+			}
+			got := string(out)
+
+			if tc.wantNot != "" && strings.Contains(got, tc.wantNot) {
+				t.Fatalf("log line reached the page unescaped (found %q):\n%s", tc.wantNot, got)
+			}
+			// v-pre is what stops Vue from compiling a mustache in the line.
+			if !strings.Contains(got, "v-pre") {
+				t.Fatalf("log line rendered without v-pre — Vue will evaluate {{ }} in it:\n%s", got)
+			}
+		})
+	}
+}
+
 // TestProgressTextDisplayEmpty keeps the "no progress text, no box" behaviour
 // the render sites relied on before the helper was extracted.
 func TestProgressTextDisplayEmpty(t *testing.T) {

@@ -307,6 +307,22 @@ func progressTextDisplay(progressText string) h.HTMLComponent {
 	)
 }
 
+// jobLogLine renders one line of a job's task log.
+//
+// The v-pre is load-bearing, not cosmetic. go-plaid compiles the response body
+// as a Vue template, so a line containing {{ … }} is evaluated as an expression
+// rather than shown. Job logs carry names chosen elsewhere — files inside an
+// imported package, messages from a remote API — so without it a file called
+//
+//	{{constructor.constructor('alert(1)')()}}.pdf
+//
+// turns a log line into client-side template injection. Escaping with Text
+// stops the browser's HTML parser; it does not stop Vue's compiler. Both are
+// needed, which is why they live together here rather than at each call site.
+func jobLogLine(text string) h.HTMLComponent {
+	return h.P().Attr("v-pre", true).Style(`margin: 0;margin-bottom: 4px;`).Children(h.Text(text))
+}
+
 func actionJobLog(b Builder, inst *QorJobInstance) h.HTMLComponent {
 	var logLines []h.HTMLComponent
 	logs := make([]string, 0, 100)
@@ -325,11 +341,11 @@ func actionJobLog(b Builder, inst *QorJobInstance) h.HTMLComponent {
 	if len(logs) > 18 {
 		reverseStyle = "display: flex;flex-direction: column-reverse;"
 		for i := len(logs) - 1; i >= 0; i-- {
-			logLines = append(logLines, h.P().Style(`margin: 0;margin-bottom: 4px;`).Children(h.Text(logs[i])))
+			logLines = append(logLines, jobLogLine(logs[i]))
 		}
 	} else {
 		for _, l := range logs {
-			logLines = append(logLines, h.P().Style(`margin: 0;margin-bottom: 4px;`).Children(h.Text(l)))
+			logLines = append(logLines, jobLogLine(l))
 		}
 	}
 	return h.Div().Class("mb-3").Style(fmt.Sprintf(`

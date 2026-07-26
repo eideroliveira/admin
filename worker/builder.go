@@ -863,9 +863,7 @@ func (b *Builder) eventLoadHiddenLogs(ctx *web.EventContext) (er web.EventRespon
 	}
 	logLines := make([]HTMLComponent, 0, len(logs))
 	for i := len(logs) - 1; i >= 0; i-- {
-		logLines = append(logLines, P().Style(`
-    margin: 0;
-    margin-bottom: 4px;`).Children(Text(logs[i].Log)))
+		logLines = append(logLines, jobLogLine(logs[i].Log))
 	}
 	er.UpdatePortals = append(er.UpdatePortals,
 		&web.PortalUpdate{
@@ -899,9 +897,7 @@ func (b *Builder) jobProgressing(
 		).Name("worker_hiddenLogs"))
 	}
 	for _, l := range logs {
-		logLines = append(logLines, P().Attr("v-pre", true).Style(`
-    margin: 0;
-    margin-bottom: 4px;`).Children(Text(l)))
+		logLines = append(logLines, jobLogLine(l))
 	}
 	// https://stackoverflow.com/a/44051405/10150757
 	var reverseStyle string
