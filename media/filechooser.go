@@ -602,10 +602,16 @@ func (mb *Builder) mediaLibraryTopOperations(clickTabEvent, field, tab, typeVal,
 		fileAccept string
 	)
 
-	if mb.fileAccept != "" {
-		fileAccept = mb.fileAccept
-	} else if cfg.FileAccept != "" {
+	// A field's own FileAccept wins over the builder-wide default. The other
+	// order made the per-field setting unreachable whenever a builder set one
+	// at all, which left a field wanting an unusual type (a PDF, say) with
+	// only one way out: widening the global — and that makes every *other*
+	// field's chooser offer types it will filter out of the listing after the
+	// upload has already happened.
+	if cfg.FileAccept != "" {
 		fileAccept = cfg.FileAccept
+	} else if mb.fileAccept != "" {
+		fileAccept = mb.fileAccept
 	} else {
 		fileAccept = "*/*"
 		if cfg.AllowType == media_library.ALLOW_TYPE_IMAGE {
