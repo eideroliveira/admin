@@ -28,6 +28,9 @@ const (
 	cardWidth              = "w-100"
 	chooseFileDialogWidth  = 1037
 	chooseFileDialogHeight = 692
+	// defaultThumbSize is the media box thumbnail geometry used when the
+	// config declares no Sizes to read it from — see mediaBoxThumb.
+	defaultThumbSize = 200
 )
 
 func fileChooser(mb *Builder) web.EventFunc {

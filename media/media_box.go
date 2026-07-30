@@ -213,9 +213,21 @@ func mediaBoxThumb(msgr *Messages, cfg *media_library.MediaBoxConfig,
 		url = f.URLNoCached()
 	}
 
+	// A config with no Sizes at all — the shape a plain-file picker takes
+	// (AllowType file, no resizing, e.g. a PDF), since any Sizes entry makes
+	// the chooser filter the library down to images — has no entry for the
+	// default key either. Both dimensions below are read unconditionally,
+	// and h.If builds its children eagerly, so a nil size panicked here
+	// before the thumbnail could ever render. thumbName already guards for
+	// nil; this keeps the card geometry doing the same.
+	thumbWidth, thumbHeight := defaultThumbSize, defaultThumbSize
+	if size != nil {
+		thumbWidth, thumbHeight = size.Width, size.Height
+	}
+
 	card := VCard(
 		h.If(base.IsImageFormat(f.FileName),
-			VImg().Src(url).Cover(true).Height(size.Height),
+			VImg().Src(url).Cover(true).Height(thumbHeight),
 		).Else(
 			h.Div(
 				fileThumb(f.FileName),
@@ -227,7 +239,7 @@ func mediaBoxThumb(msgr *Messages, cfg *media_library.MediaBoxConfig,
 				thumbName(thumb, size, fileSize, f),
 			),
 		),
-	).Width(size.Width)
+	).Width(thumbWidth)
 
 	if base.IsImageFormat(f.FileName) && (size != nil || thumb == base.DefaultSizeKey) && !disabled && !cfg.DisableCrop {
 		card.Attr("@click", web.Plaid().
