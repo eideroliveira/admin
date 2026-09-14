@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"path"
 	"reflect"
+	"slices"
 	"strings"
 	"time"
 
@@ -987,24 +988,37 @@ func (b *Builder) jobSelectList(
 	if v := vErr.GetFieldErrors("Job"); len(v) > 0 {
 		alert = VAlert(Text(strings.Join(v, ","))).Type("error")
 	}
-	items := make([]HTMLComponent, 0, len(b.jbs))
+	type jobOption struct {
+		name, label string
+	}
+	options := make([]jobOption, 0, len(b.jbs))
 	for _, jb := range b.jbs {
-		if !jb.global {
+		if !jb.global || editIsAllowed(ctx.R, jb.name) != nil {
 			continue
 		}
-		label := getTJob(ctx.R, jb.name)
-		if editIsAllowed(ctx.R, jb.name) == nil {
-			items = append(items,
-				VListItem(
-					VListItemTitle(
-						A(Text(label)).Attr("@click",
-							web.Plaid().EventFunc("worker_selectJob").
-								Query("jobName", jb.name).
-								Go(),
-						),
-					)),
-			)
+		options = append(options, jobOption{name: jb.name, label: getTJob(ctx.R, jb.name)})
+	}
+	// Sorted by the label the operator reads, not registration order, so a
+	// job is found by scanning the alphabet rather than knowing where it was
+	// registered.
+	slices.SortFunc(options, func(a, b jobOption) int {
+		if c := strings.Compare(strings.ToLower(a.label), strings.ToLower(b.label)); c != 0 {
+			return c
 		}
+		return strings.Compare(a.name, b.name)
+	})
+	items := make([]HTMLComponent, 0, len(options))
+	for _, o := range options {
+		items = append(items,
+			VListItem(
+				VListItemTitle(
+					A(Text(o.label)).Attr("@click",
+						web.Plaid().EventFunc("worker_selectJob").
+							Query("jobName", o.name).
+							Go(),
+					),
+				)),
+		)
 	}
 
 	return Div(
