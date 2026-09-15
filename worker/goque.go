@@ -332,12 +332,28 @@ func (q *goque) Shutdown(ctx context.Context) error {
 	q.wks = nil
 	q.mu.Unlock()
 
-	var errs error
+	// Stop every worker concurrently. que.Worker.Stop blocks until the jobs that
+	// worker is already performing finish (it never cancels them), so stopping
+	// the workers one after another let the first slow job spend the whole ctx:
+	// every later worker then failed at once with ctx.Err() while its own jobs
+	// were never waited for. In parallel, each worker gets the full deadline.
+	var (
+		mu   sync.Mutex
+		errs error
+		wg   sync.WaitGroup
+	)
 	for _, wk := range wks {
-		if err := wk.Stop(ctx); err != nil {
-			errs = multierr.Append(errs, err)
-		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := wk.Stop(ctx); err != nil {
+				mu.Lock()
+				errs = multierr.Append(errs, err)
+				mu.Unlock()
+			}
+		}()
 	}
+	wg.Wait()
 	return errs
 }
 
