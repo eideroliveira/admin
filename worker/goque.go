@@ -251,7 +251,13 @@ func (q *goque) supervise(name string, wk *que.Worker, build func() (*que.Worker
 	backoff := workerRestartInitialBackoff
 	for {
 		if wk != nil {
-			q.addWorker(wk)
+			// Listen starts supervisors asynchronously, so this can run after a
+			// Shutdown has already closed stopCh and taken its snapshot of wks.
+			// Registering (and running) the worker then would leave it running
+			// with nothing left to stop it.
+			if !q.addWorkerUnlessStopped(wk, stopCh) {
+				return
+			}
 			started := time.Now()
 			err := wk.Run()
 			q.removeWorker(wk)
@@ -295,10 +301,19 @@ func (q *goque) recordError(msg string) {
 	q.db.Create(&GoQueError{Error: msg})
 }
 
-func (q *goque) addWorker(wk *que.Worker) {
+// addWorkerUnlessStopped registers wk so Shutdown can stop it, unless stopCh is
+// already closed. The check and the append happen under the same mu that
+// Shutdown holds while it closes stopCh and snapshots wks, so a worker is
+// either in that snapshot or never registered at all; there is no window in
+// which it misses both.
+func (q *goque) addWorkerUnlessStopped(wk *que.Worker, stopCh chan struct{}) bool {
 	q.mu.Lock()
 	defer q.mu.Unlock()
+	if isClosed(stopCh) {
+		return false
+	}
 	q.wks = append(q.wks, wk)
+	return true
 }
 
 func (q *goque) removeWorker(wk *que.Worker) {
