@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/tnclong/go-que"
@@ -120,6 +121,16 @@ func (*goque) Remove(ctx context.Context, job QueJobInterface) error {
 	return job.SetStatus(JobStatusCancelled)
 }
 
+// isAbortStatus reports whether a running job's stored status asks it to stop.
+// Cancelled counts as well as killed: an abort takes the Remove path whenever
+// the row reads new or scheduled, and the row can read that while the handler
+// is running — "Run now" and the status dropdown both relabel an instance, and
+// a job relabelled mid-run used to be cancelled on paper while it kept its
+// worker's only slot.
+func isAbortStatus(status string) bool {
+	return status == JobStatusKilled || status == JobStatusCancelled
+}
+
 func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (QueJobInterface, error)) error {
 	q.mu.Lock()
 	q.stopCh = make(chan struct{})
@@ -180,6 +191,14 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 					if job.GetStatus() == JobStatusCancelled {
 						return qj.Expire(ctx, errors.New("job is cancelled"))
 					}
+					// A second entry for a run that already ended — the rerun
+					// buttons used to enqueue one per click — must not rewrite
+					// the outcome. Only a run left "running" (its process died
+					// mid-run and the entry was redelivered) is marked killed.
+					switch job.GetStatus() {
+					case JobStatusDone, JobStatusException, JobStatusKilled:
+						return qj.Expire(ctx, errors.New("job already finished: "+job.GetStatus()))
+					}
 					if job.GetStatus() != JobStatusNew && job.GetStatus() != JobStatusScheduled {
 						job.SetStatus(JobStatusKilled)
 						return errors.New("invalid job status, current status: " + job.GetStatus())
@@ -191,18 +210,20 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 					}
 
 					hctx, cf := context.WithCancel(ctx)
+					defer cf()
 					hDoneC := make(chan struct{})
-					isAborted := false
+					var isAborted atomic.Bool
 					go func() {
 						timer := time.NewTicker(time.Second)
+						defer timer.Stop()
 						for {
 							select {
 							case <-hDoneC:
 								return
 							case <-timer.C:
 								status, _ := job.FetchAndSetStatus()
-								if status == JobStatusKilled {
-									isAborted = true
+								if isAbortStatus(status) {
+									isAborted.Store(true)
 									cf()
 									return
 								}
@@ -210,16 +231,20 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 						}
 					}()
 					err = q.run(hctx, job)
-					if !isAborted {
-						hDoneC <- struct{}{}
+					// Closed rather than sent on: the watcher may already have
+					// returned after an abort, and a send would then block this
+					// worker's only slot forever.
+					close(hDoneC)
+					if isAborted.Load() {
+						// The status the admin set (killed or cancelled) is the
+						// outcome; the context error the handler returns on the
+						// way out must not overwrite it with "exception".
+						return qj.Expire(ctx, errors.New("manually aborted"))
 					}
 					if err != nil {
 						job.SetProgressText(err.Error())
 						job.SetStatus(JobStatusException)
 						return err
-					}
-					if isAborted {
-						return qj.Expire(ctx, errors.New("manually aborted"))
 					}
 
 					err = job.SetStatus(JobStatusDone)
