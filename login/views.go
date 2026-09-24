@@ -2,6 +2,7 @@ package login
 
 import (
 	"bytes"
+	"crypto/subtle"
 	"encoding/base64"
 	"fmt"
 	"image/png"
@@ -522,7 +523,9 @@ func defaultResetPasswordPage(vh *login.ViewHelper, pb *presets.Builder) web.Pag
 			r.Body = Div(Text("token expired"))
 			return r, nil
 		}
-		if token != storedToken {
+		// Constant time: a plain != is an oracle for the token byte by byte.
+		// An empty stored token (no reset requested) never matches.
+		if storedToken == "" || subtle.ConstantTimeCompare([]byte(token), []byte(storedToken)) != 1 {
 			r.Body = Div(Text("invalid token"))
 			return r, nil
 		}
