@@ -36,6 +36,20 @@ const (
 	jobLookupRetryInterval = 3 * time.Second
 )
 
+// goqueLockPerSecond caps how often each job's worker polls its queue.
+//
+// Every registered job gets its own worker, and an idle worker polls at this
+// rate for as long as the process runs: at 10/s, ~70 jobs kept ~700 lock
+// queries a second (a recursive CTE each) against Postgres with nothing
+// queued, two thirds of an idle gordpress's CPU in a 2026-09-29 profile, and
+// load on the database every page query shares. At 2/s a queued job waits at
+// most 0.5 s before it is picked up instead of 0.1 s.
+//
+// Throughput does not drop: each poll claims up to Concurrency jobs, and
+// MaxPerformPerSecond below already caps execution at 2*Concurrency a second,
+// which two polls a second exactly supply. Keep the two in step.
+const goqueLockPerSecond = 2
+
 type goque struct {
 	q  que.Queue
 	db *gorm.DB
@@ -135,7 +149,7 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 			return que.NewWorker(que.WorkerOptions{
 				Queue:                     "worker_" + jd.Name,
 				Mutex:                     q.q.Mutex(),
-				MaxLockPerSecond:          10,
+				MaxLockPerSecond:          goqueLockPerSecond,
 				MaxBufferJobsCount:        0,
 				MaxPerformPerSecond:       float64(2 * jd.Concurrency),
 				MaxConcurrentPerformCount: jd.Concurrency,
