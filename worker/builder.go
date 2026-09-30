@@ -36,6 +36,7 @@ type Builder struct {
 	jbs                  []*JobBuilder
 	mb                   *presets.ModelBuilder
 	getCurrentUserIDFunc func(r *http.Request) string
+	operatorFunc         func(ctx context.Context) string
 	ab                   *activity.Builder
 }
 
@@ -123,6 +124,36 @@ func (b *Builder) GetQueue() Queue {
 func (b *Builder) GetCurrentUserIDFunc(f func(r *http.Request) string) *Builder {
 	b.getCurrentUserIDFunc = f
 	return b
+}
+
+// OperatorFunc resolves who started a job from the context it is created
+// under, and stores the answer on the job instance (QorJobInstance.Operator).
+//
+// GetCurrentUserIDFunc only sees jobs created from the worker's own admin
+// forms and buttons, which carry a request. Most jobs are created through
+// CreateSystemJob, with a context and no request — including the ones an
+// admin button starts — and those were recorded with no operator at all.
+// This one sees both: a request's own context is passed to it.
+func (b *Builder) OperatorFunc(f func(ctx context.Context) string) *Builder {
+	b.operatorFunc = f
+	return b
+}
+
+// operator returns who is starting a job under ctx: the request's user when
+// GetCurrentUserIDFunc names one, else whatever OperatorFunc reads off ctx.
+func (b *Builder) operator(ctx context.Context, r *http.Request) string {
+	if r != nil && b.getCurrentUserIDFunc != nil {
+		if op := b.getCurrentUserIDFunc(r); op != "" {
+			return op
+		}
+	}
+	if r != nil {
+		ctx = r.Context()
+	}
+	if b.operatorFunc == nil || ctx == nil {
+		return ""
+	}
+	return b.operatorFunc(ctx)
 }
 
 // Activity sets Activity Builder to log activities
@@ -518,7 +549,7 @@ func (b *Builder) createJob(ctx *web.EventContext, qorJob *QorJob) (j *QorJob, e
 		if err := tx.Create(j).Error; err != nil {
 			return err
 		}
-		inst, err = jb.newJobInstanceWithDB(tx, ctx.R, j.ID, qorJob.Job, args, context)
+		inst, err = jb.newJobInstanceWithDB(tx, b.operator(nil, ctx.R), j.ID, qorJob.Job, args, context)
 		return err
 	})
 	if err != nil {
@@ -575,7 +606,7 @@ func (b *Builder) CreateSystemJob(ctx context.Context, jobName string, args inte
 		if err := tx.Create(j).Error; err != nil {
 			return err
 		}
-		inst, err = jb.newJobInstanceWithDB(tx, nil, j.ID, jobName, args, nil)
+		inst, err = jb.newJobInstanceWithDB(tx, b.operator(ctx, nil), j.ID, jobName, args, nil)
 		return err
 	})
 	if err != nil {

@@ -188,7 +188,7 @@ func (jb *JobBuilder) newJobInstance(
 	args interface{},
 	context interface{},
 ) (*QorJobInstance, error) {
-	return jb.newJobInstanceWithDB(jb.b.db, r, qorJobID, qorJobName, args, context)
+	return jb.newJobInstanceWithDB(jb.b.db, jb.b.operator(nil, r), qorJobID, qorJobName, args, context)
 }
 
 // newJobInstanceWithDB creates the instance on db, which callers that also
@@ -197,9 +197,11 @@ func (jb *JobBuilder) newJobInstance(
 // transaction rolls back: the qor_jobs row disappears, nothing ever enqueues
 // the instance, and it sits at "new" forever while every listing reports it as
 // queued.
+//
+// operator is who started this run (Builder.operator); "" records nobody.
 func (jb *JobBuilder) newJobInstanceWithDB(
 	db *gorm.DB,
-	r *http.Request,
+	operator string,
 	qorJobID uint,
 	qorJobName string,
 	args interface{},
@@ -233,9 +235,7 @@ func (jb *JobBuilder) newJobInstanceWithDB(
 		Context:  ctx,
 		Job:      qorJobName,
 		Status:   JobStatusNew,
-	}
-	if r != nil && jb.b.getCurrentUserIDFunc != nil {
-		inst.Operator = jb.b.getCurrentUserIDFunc(r)
+		Operator: operator,
 	}
 	err := db.Create(&inst).Error
 	if err != nil {
