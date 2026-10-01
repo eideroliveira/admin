@@ -38,7 +38,20 @@ type Builder struct {
 	getCurrentUserIDFunc func(r *http.Request) string
 	operatorFunc         func(ctx context.Context) string
 	ab                   *activity.Builder
+	jobListFilter        JobListFilter
 }
+
+// ParamJobList names the job list the New drawer shows. It arrives as a query
+// parameter on the event that opens the drawer, and rides the drawer's form
+// after that, so the list survives picking a job and going back. Empty is the
+// listing's own New button.
+const ParamJobList = "job_list"
+
+// JobListFilter picks, from the jobs the New drawer could list for this
+// request (global ones the user may edit, in display order), the ones list
+// shows. It is not a permission check: the drawer still creates whatever job
+// name it is posted.
+type JobListFilter func(ctx *web.EventContext, list string, jobNames []string) []string
 
 // Options contains configuration options for worker Builder.
 type Options struct {
@@ -157,6 +170,13 @@ func (b *Builder) operator(ctx context.Context, r *http.Request) string {
 }
 
 // Activity sets Activity Builder to log activities
+// JobListFilter sets the filter deciding which jobs each job list shows (see
+// ParamJobList). Without one, every list shows every global job.
+func (b *Builder) JobListFilter(f JobListFilter) *Builder {
+	b.jobListFilter = f
+	return b
+}
+
 func (b *Builder) Activity(ab *activity.Builder) *Builder {
 	b.ab = ab
 	return b
@@ -1038,6 +1058,18 @@ func (b *Builder) jobSelectList(
 		}
 		return strings.Compare(a.name, b.name)
 	})
+	list := ctx.R.FormValue(ParamJobList)
+	if b.jobListFilter != nil {
+		names := make([]string, len(options))
+		for i, o := range options {
+			names[i] = o.name
+		}
+		keep := make(map[string]bool)
+		for _, n := range b.jobListFilter(ctx, list, names) {
+			keep[n] = true
+		}
+		options = slices.DeleteFunc(options, func(o jobOption) bool { return !keep[o.name] })
+	}
 	items := make([]HTMLComponent, 0, len(options))
 	for _, o := range options {
 		items = append(items,
@@ -1054,6 +1086,7 @@ func (b *Builder) jobSelectList(
 
 	return Div(
 		Input("").Type("hidden").Attr(web.VField("Job", job)...),
+		Input("").Type("hidden").Attr(web.VField(ParamJobList, list)...),
 		If(job == "",
 			alert,
 			VList(items...).Nav(true).Density(DensityCompact),
