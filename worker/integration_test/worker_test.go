@@ -97,11 +97,28 @@ func TestJobActions(t *testing.T) {
 		w = httptest.NewRecorder()
 		pb.ServeHTTP(w, r)
 		body := w.Body.String()
-		expectItems := []string{"Killed", "job aborted"}
+		expectItems := []string{"Killed", "job aborted", "worker_rerunJob"}
 		for _, ei := range expectItems {
 			if ok := strings.Contains(body, ei); !ok {
 				t.Fatalf("want item %q, but not found\n", ei)
 			}
+		}
+
+		// A killed job — aborted here, or interrupted by a restart — is rerun
+		// like a finished one.
+		r = httptest.NewRequest(http.MethodPost, fmt.Sprintf(`/workers/%d?__execute_event__=worker_rerunJob&job=longRunningJob&jobID=%d`, j.ID, j.ID), http.NoBody)
+		w = httptest.NewRecorder()
+		pb.ServeHTTP(w, r)
+		j = mustGetFirstJob()
+		if j.Status != worker.JobStatusNew {
+			t.Fatalf("want status %q after rerunning a killed job, got %q", worker.JobStatusNew, j.Status)
+		}
+		// The rerun is a new instance: it runs to the end instead of being
+		// killed again for the status the old one was left in.
+		integration.ConsumeQueItem()
+		j = mustGetFirstJob()
+		if j.Status != worker.JobStatusDone {
+			t.Fatalf("want rerun of a killed job to finish %q, got %q", worker.JobStatusDone, j.Status)
 		}
 	}
 

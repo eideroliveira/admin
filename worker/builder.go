@@ -723,6 +723,20 @@ func (b *Builder) doAbortJob(ctx context.Context, inst *QorJobInstance) (err err
 	}
 }
 
+// canRerun reports whether a job instance in this status may be run again
+// with its arguments: it finished (done), failed (exception), or was killed —
+// aborted by hand, or found still "running" when a restart redelivered it,
+// which is how a deploy leaves every job it interrupted. A rerun is a new
+// instance, so the killed one keeps its status and its aborting watcher.
+// Cancelled is a scheduled job someone removed, and is not offered.
+func canRerun(status string) bool {
+	switch status {
+	case JobStatusDone, JobStatusException, JobStatusKilled:
+		return true
+	}
+	return false
+}
+
 func (b *Builder) eventRerunJob(ctx *web.EventContext) (er web.EventResponse, err error) {
 	qorJobID := uint(ctx.ParamAsInt("jobID"))
 	qorJobName := ctx.R.FormValue("job")
@@ -736,11 +750,11 @@ func (b *Builder) eventRerunJob(ctx *web.EventContext) (er web.EventResponse, er
 	if err != nil {
 		return er, err
 	}
-	// The Rerun button is rendered for both done and failed (exception) jobs,
-	// so the handler must accept either — otherwise rerunning a failed job
-	// returns an error, which executeEvent turns into a panic.
-	if old.Status != JobStatusDone && old.Status != JobStatusException {
-		return er, errors.New("job is not done or failed")
+	// The handler accepts exactly what renders the button (canRerun);
+	// refusing a status the button is shown for returns an error, which
+	// executeEvent turns into a panic.
+	if !canRerun(old.Status) {
+		return er, errors.New("job is not done, failed or killed")
 	}
 
 	inst, err := jb.newJobInstance(ctx.R, qorJobID, qorJobName, old.Args, old.Context)
@@ -1013,7 +1027,7 @@ func (b *Builder) jobProgressing(
 							Query("job", job).
 							Go()),
 				),
-				If(status == JobStatusDone || status == JobStatusException,
+				If(canRerun(status),
 					VBtn(msgr.ActionRerunJob).Color("primary").
 						Attr("@click", web.Plaid().
 							URL(eURL).
