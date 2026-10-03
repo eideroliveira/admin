@@ -31,6 +31,7 @@ type JobBuilder struct {
 	contextHandler func(*web.EventContext) map[string]interface{} // optional
 	global         bool
 	concurrency    int // max concurrent instances (0 = unlimited)
+	onInterrupted  InterruptedHandler
 }
 
 func newJob(b *Builder, name string) *JobBuilder {
@@ -110,6 +111,14 @@ func (jb *JobBuilder) GetResource() interface{} {
 
 func (jb *JobBuilder) Handler(h JobHandler) *JobBuilder {
 	jb.h = h
+	return jb
+}
+
+// OnInterrupted registers what to do with an instance of this job that the
+// death of its process interrupted (QorJobDefinition.OnInterrupted). Without
+// one, such an instance is marked killed and nothing else happens.
+func (jb *JobBuilder) OnInterrupted(fn InterruptedHandler) *JobBuilder {
+	jb.onInterrupted = fn
 	return jb
 }
 

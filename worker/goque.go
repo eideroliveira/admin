@@ -194,9 +194,30 @@ func (q *goque) Listen(jobDefs []*QorJobDefinition, getJob func(qorJobID uint) (
 					if job.GetStatus() == JobStatusCancelled {
 						return qj.Expire(ctx, errors.New("job is cancelled"))
 					}
-					if job.GetStatus() != JobStatusNew && job.GetStatus() != JobStatusScheduled {
+					if st := job.GetStatus(); st != JobStatusNew && st != JobStatusScheduled {
 						job.SetStatus(JobStatusKilled)
-						return errors.New("invalid job status, current status: " + job.GetStatus())
+						if st == JobStatusRunning {
+							// The queue hands an entry over only once its previous
+							// performer's session is gone, so an instance still
+							// "running" here was cut off by the death of the process
+							// that ran it — a deploy, a crash — not stopped by anyone
+							// (a stop writes "killed" first). Say so on the task, and
+							// let the job decide what comes next.
+							job.AddLog("Interrupted: the process running this task stopped (server restart or crash) before it finished.")
+							if jd.OnInterrupted != nil {
+								func() {
+									defer func() {
+										if r := recover(); r != nil {
+											job.AddLog(fmt.Sprintf("OnInterrupted panicked: %v\n%s", r, debug.Stack()))
+										}
+									}()
+									jd.OnInterrupted(ctx, job)
+								}()
+							}
+						}
+						// st, not GetStatus(): read after the write above it always
+						// said "killed".
+						return errors.New("invalid job status, current status: " + st)
 					}
 
 					err = job.SetStatus(JobStatusRunning)

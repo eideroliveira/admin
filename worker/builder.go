@@ -502,9 +502,10 @@ func (b *Builder) Listen() {
 	var jds []*QorJobDefinition
 	for _, jb := range b.jbs {
 		jds = append(jds, &QorJobDefinition{
-			Name:        jb.name,
-			Handler:     jb.h,
-			Concurrency: jb.concurrency,
+			Name:          jb.name,
+			Handler:       jb.h,
+			Concurrency:   jb.concurrency,
+			OnInterrupted: jb.onInterrupted,
 		})
 	}
 	err := b.q.Listen(jds, func(qorJobID uint) (QueJobInterface, error) {
