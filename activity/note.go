@@ -107,7 +107,18 @@ func getNotesCounts(db *gorm.DB, tablePrefix string, uid string, modelName strin
 	return counts, nil
 }
 
+// markNotesAsReadForModel marks every record of modelName read for uid.
 func markNotesAsReadForModel(db *gorm.DB, tablePrefix, uid, modelName string) error {
+	return markNotesAsRead(db, tablePrefix, uid, modelName, nil)
+}
+
+// markNotesAsRead replaces uid's last views on the records of modelName
+// named by modelKeys — every record of the model when modelKeys is nil —
+// with one hidden last view per record, dated at the record's newest
+// notification. Records outside modelKeys keep their last views: a caller
+// that lists a few records out of thousands notified writes a few rows,
+// not one per record of the model.
+func markNotesAsRead(db *gorm.DB, tablePrefix, uid, modelName string, modelKeys []string) error {
 	s, err := ParseSchemaWithDB(db, &ActivityLog{})
 	if err != nil {
 		return err
@@ -122,10 +133,13 @@ func markNotesAsReadForModel(db *gorm.DB, tablePrefix, uid, modelName string) er
 			ModelLink    string
 			MaxCreatedAt time.Time
 		}
-		if err := tx.Table(tableName).
+		notes := tx.Table(tableName).
 			Select("model_name, model_keys, MAX(model_label) AS model_label, MAX(model_link) AS model_link, MAX(created_at) AS max_created_at").
-			Where("action = ? AND model_name = ? AND deleted_at IS NULL", ActionNotification, modelName).
-			Group("model_name, model_keys").Scan(&results).Error; err != nil {
+			Where("action = ? AND model_name = ? AND deleted_at IS NULL", ActionNotification, modelName)
+		if modelKeys != nil {
+			notes = notes.Where("model_keys IN ?", modelKeys)
+		}
+		if err := notes.Group("model_name, model_keys").Scan(&results).Error; err != nil {
 			return errors.Wrap(err, "find created_at of last notes")
 		}
 
@@ -133,9 +147,12 @@ func markNotesAsReadForModel(db *gorm.DB, tablePrefix, uid, modelName string) er
 			return nil
 		}
 
-		if err := tx.Table(tableName).Unscoped().
-			Where("user_id = ? AND action = ? AND model_name = ?", uid, ActionLastView, modelName).
-			Delete(&ActivityLog{}).Error; err != nil {
+		views := tx.Table(tableName).Unscoped().
+			Where("user_id = ? AND action = ? AND model_name = ?", uid, ActionLastView, modelName)
+		if modelKeys != nil {
+			views = views.Where("model_keys IN ?", modelKeys)
+		}
+		if err := views.Delete(&ActivityLog{}).Error; err != nil {
 			return errors.Wrap(err, "delete last views")
 		}
 
@@ -272,13 +289,46 @@ func (ab *Builder) MarkAllNotesAsRead(ctx context.Context) error {
 }
 
 // MarkNotesAsReadForModel marks all notes as read for the current user,
-// scoped to a specific model name (e.g. "Subscription").
+// scoped to a specific model name (e.g. "Subscription"): every record of
+// the model that carries a notification gets a last view. For the records
+// a page actually showed, MarkNotesAsRead.
 func (ab *Builder) MarkNotesAsReadForModel(ctx context.Context, modelName string) error {
 	user, err := ab.currentUserFunc(ctx)
 	if err != nil {
 		return err
 	}
 	return markNotesAsReadForModel(ab.db, ab.tablePrefix, user.ID, modelName)
+}
+
+// MarkNotesAsRead marks the notes on the records of modelName named by
+// modelKeys as read for the current user, and touches no other record's
+// last views. Nothing is written for an empty modelKeys.
+func (ab *Builder) MarkNotesAsRead(ctx context.Context, modelName string, modelKeys []string) error {
+	if len(modelKeys) == 0 {
+		return nil
+	}
+	user, err := ab.currentUserFunc(ctx)
+	if err != nil {
+		return err
+	}
+	return markNotesAsRead(ab.db, ab.tablePrefix, user.ID, modelName, modelKeys)
+}
+
+// NewestNotificationLink returns the link of the newest notification on
+// the record of modelName named by modelKeys, "" when none of its
+// notifications carries one. It reads the builder's own table, so a caller
+// outside this package never names it.
+func (ab *Builder) NewestNotificationLink(modelName, modelKeys string) (string, error) {
+	var link string
+	err := ab.db.Model(&ActivityLog{}).
+		Select("model_link").
+		Where("model_name = ? AND model_keys = ? AND action = ? AND model_link <> ''",
+			modelName, modelKeys, ActionNotification).
+		Order("created_at DESC").Limit(1).Scan(&link).Error
+	if err != nil {
+		return "", errors.Wrap(err, "find newest notification link")
+	}
+	return link, nil
 }
 
 // SQLConditionHasUnreadNotes returns a SQL condition that can be used in a WHERE clause to filter records that have unread notes.
