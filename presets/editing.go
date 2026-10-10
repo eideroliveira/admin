@@ -421,7 +421,13 @@ func (b *EditingBuilder) editFormFor(obj interface{}, ctx *web.EventContext) h.H
 				).Class("pa-2 detailing-page-wrap"),
 			),
 		),
-	).VSlot("{ form, dash}").DashInit("{errorMessages:{},disabled:{}}")
+	// One dash for the form, the one the scope returned below declares.
+	// The change handler sits on this scope's own tag, so it reads the dash
+	// of the scope AROUND it; a dash declared here would hand the fields and
+	// the validation listener a second object. The listener then finds no
+	// __currentValidateKeys: the first check paints its error on every empty
+	// field and no later check updates or clears one.
+	).VSlot("{ form}")
 	operateID := fmt.Sprint(time.Now().UnixNano())
 	onChangeEvent += checkFormChangeScript
 	if autosave {
