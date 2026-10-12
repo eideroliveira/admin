@@ -209,6 +209,9 @@ func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap
 	var searchItems []MenuSearchItem
 
 	for _, m := range b.p.models {
+		if m.notInMenu || (m.Info().Verifier().Do(PermList).WithReq(ctx.R).IsAllowed() != nil) {
+			continue
+		}
 		// Skip any model referenced by MenuOrder — even when its group was
 		// suppressed (permission-denied or empty), it must not leak out as a
 		// flat top-level item. Only models never listed in MenuOrder are

@@ -61,3 +61,28 @@ func TestMenuOrderSearchBox_CanBeDisabled(t *testing.T) {
 
 	assert.NotContains(t, html, "menu-search-box", "search text field should not be rendered when disabled")
 }
+
+type menuOrderTestHiddenContainer struct{ ID uint }
+type menuOrderTestUnorderedModel struct{ ID uint }
+
+func TestMenuOrder_NotInMenu_NotRenderedInUnordered(t *testing.T) {
+	pb := New()
+	pb.Model(&menuOrderTestCustomer{}).Label("Customers")
+	pb.Model(&menuOrderTestHiddenContainer{}).Label("Hidden Container").InMenu(false)
+	pb.Model(&menuOrderTestUnorderedModel{}).Label("Unordered Extra")
+	pb.MenuOrder(
+		pb.MenuGroup("E-Commerce").SubItems("menu-order-test-customers").Icon("mdi-cart"),
+	)
+
+	ctx := &web.EventContext{R: httptest.NewRequest("GET", "/admin", http.NoBody)}
+	comp := pb.menuOrder.CreateMenus(ctx)
+
+	var buf bytes.Buffer
+	require.NoError(t, h.Fprint(&buf, comp, context.Background()))
+	html := buf.String()
+
+	assert.Contains(t, html, "Customers")
+	assert.Contains(t, html, "Unordered Extra")
+	assert.NotContains(t, html, "Hidden Container", "models marked InMenu(false) must not appear in unordered menus")
+	assert.NotContains(t, html, "menu-order-test-hidden-containers", "hidden model URI must not be in menus or search index")
+}
