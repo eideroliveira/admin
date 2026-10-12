@@ -14,6 +14,8 @@ type Messages struct {
 	SuccessfullyUpdated                        string
 	SuccessfullyCreated                        string
 	Search                                     string
+	SearchMenu                                 string
+	NoMatchingMenus                            string
 	New                                        string
 	Update                                     string
 	Delete                                     string
@@ -163,6 +165,8 @@ var Messages_en_US = &Messages{
 	SuccessfullyUpdated: "Successfully Updated",
 	SuccessfullyCreated: "Successfully Created",
 	Search:              "Search",
+	SearchMenu:          "Search menu...",
+	NoMatchingMenus:     "No matching menus",
 	New:                 "New",
 	Update:              "Update",
 	Delete:              "Delete",
@@ -262,6 +266,8 @@ var Messages_zh_CN = &Messages{
 	SuccessfullyUpdated: "成功更新了",
 	SuccessfullyCreated: "成功创建了",
 	Search:              "搜索",
+	SearchMenu:          "搜索菜单...",
+	NoMatchingMenus:     "未找到匹配的菜单",
 	New:                 "新建",
 	Update:              "更新",
 	Delete:              "删除",
@@ -361,6 +367,8 @@ var Messages_ja_JP = &Messages{
 	SuccessfullyUpdated: "更新に成功しました",
 	SuccessfullyCreated: "作成に成功しました",
 	Search:              "検索",
+	SearchMenu:          "メニューを検索...",
+	NoMatchingMenus:     "一致するメニューが見つかりません",
 	New:                 "作成する",
 	Update:              "更新",
 	Delete:              "削除",

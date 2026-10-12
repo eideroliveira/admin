@@ -406,6 +406,10 @@ func (b *Builder) MenuOrder(items ...interface{}) {
 	b.menuOrder.Append(items...)
 }
 
+func (b *Builder) GetMenuOrder() *MenuOrderBuilder {
+	return b.menuOrder
+}
+
 type defaultMenuIconRE struct {
 	re   *regexp.Regexp
 	icon string

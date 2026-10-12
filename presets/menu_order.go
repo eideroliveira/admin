@@ -1,6 +1,7 @@
 package presets
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -13,12 +14,25 @@ import (
 	h "github.com/theplant/htmlgo"
 )
 
+var _ = json.Marshal
+
+type MenuSearchItem struct {
+	Key     string `json:"key"`
+	Group   string `json:"group"`
+	GroupUI string `json:"groupUI"`
+	GroupEN string `json:"groupEN"`
+	LabelUI string `json:"labelUI"`
+	LabelEN string `json:"labelEN"`
+	URI     string `json:"uri"`
+}
+
 type MenuOrderBuilder struct {
 	p *Builder
 	// string or *MenuGroupBuilder
 	order             []interface{}
 	modelMap          map[string]*ModelBuilder
 	menuComponentFunc func(menus []h.HTMLComponent, menuGroupSelected, menuItemSelected string) h.HTMLComponent
+	searchBoxEnabled  bool
 	once              sync.Once
 }
 
@@ -28,7 +42,12 @@ type menuOrderItem struct {
 }
 
 func NewMenuOrderBuilder(b *Builder) *MenuOrderBuilder {
-	return &MenuOrderBuilder{p: b}
+	return &MenuOrderBuilder{p: b, searchBoxEnabled: true}
+}
+
+func (b *MenuOrderBuilder) SearchBox(v bool) *MenuOrderBuilder {
+	b.searchBoxEnabled = v
+	return b
 }
 
 func (b *MenuOrderBuilder) MenuComponentFunc(fn func(menus []h.HTMLComponent, menuGroupSelected, menuItemSelected string) h.HTMLComponent) *MenuOrderBuilder {
@@ -124,14 +143,15 @@ func (b *MenuOrderBuilder) CreateMenus(ctx *web.EventContext) h.HTMLComponent {
 	b.initializeModelMap()
 
 	inOrderMap := make(map[string]menuOrderItem)
-	menus := b.buildOrderedMenus(ctx, inOrderMap)
-	unorderedMenus := b.buildUnorderedMenus(ctx, inOrderMap, b.referencedModelNames())
+	menus, searchItems := b.buildOrderedMenus(ctx, inOrderMap)
+	unorderedMenus, unorderedSearchItems := b.buildUnorderedMenus(ctx, inOrderMap, b.referencedModelNames())
 
 	menus = append(menus, unorderedMenus...)
+	searchItems = append(searchItems, unorderedSearchItems...)
 
 	activeMenuItem, selection := b.getActiveMenuState(ctx, inOrderMap)
 
-	return b.buildMenuComponent(menus, activeMenuItem, selection)
+	return b.buildMenuComponent(ctx, menus, activeMenuItem, selection, searchItems)
 }
 
 func (b *MenuOrderBuilder) initializeModelMap() {
@@ -143,30 +163,50 @@ func (b *MenuOrderBuilder) initializeModelMap() {
 	})
 }
 
-func (b *MenuOrderBuilder) buildOrderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem) []h.HTMLComponent {
+func (b *MenuOrderBuilder) buildOrderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem) ([]h.HTMLComponent, []MenuSearchItem) {
 	var menus []h.HTMLComponent
+	var searchItems []MenuSearchItem
 
 	for _, om := range b.order {
 		switch v := om.(type) {
 		case string:
-			menuItem := b.buildMenuItem(v, false, "", ctx, inOrderMap)
+			m, ok := b.check(v, "", ctx)
+			if !ok {
+				continue
+			}
+			menuItem := b.buildMenuItemWithModel(m, false, "", ctx, inOrderMap)
 			if menuItem != nil {
 				menus = append(menus, menuItem)
+				labelEN := m.Info().Label()
+				if m.label != "" && m.label != labelEN {
+					labelEN = labelEN + " " + m.label
+				}
+				searchItems = append(searchItems, MenuSearchItem{
+					Key:     m.uriName,
+					Group:   "",
+					GroupUI: "",
+					GroupEN: "",
+					LabelUI: m.Info().LabelName(ctx, false),
+					LabelEN: labelEN,
+					URI:     m.Info().URIName(),
+				})
 			}
 		case *MenuGroupBuilder:
-			menuGroup := b.buildMenuGroup(v, ctx, inOrderMap)
+			menuGroup, groupSearchItems := b.buildMenuGroup(v, ctx, inOrderMap)
 			if menuGroup != nil {
 				menus = append(menus, menuGroup)
+				searchItems = append(searchItems, groupSearchItems...)
 			}
 		default:
 			panic(fmt.Sprintf("unknown menu order item type: %T\n", om))
 		}
 	}
-	return menus
+	return menus, searchItems
 }
 
-func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem, referenced map[string]struct{}) []h.HTMLComponent {
+func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap map[string]menuOrderItem, referenced map[string]struct{}) ([]h.HTMLComponent, []MenuSearchItem) {
 	var menus []h.HTMLComponent
+	var searchItems []MenuSearchItem
 
 	for _, m := range b.p.models {
 		// Skip any model referenced by MenuOrder — even when its group was
@@ -179,12 +219,25 @@ func (b *MenuOrderBuilder) buildUnorderedMenus(ctx *web.EventContext, inOrderMap
 		if _, exists := inOrderMap[m.uriName]; exists {
 			continue
 		}
-		menuItem := b.buildMenuItem(m.uriName, false, "", ctx, inOrderMap)
+		menuItem := b.buildMenuItemWithModel(m, false, "", ctx, inOrderMap)
 		if menuItem != nil {
 			menus = append(menus, menuItem)
+			labelEN := m.Info().Label()
+			if m.label != "" && m.label != labelEN {
+				labelEN = labelEN + " " + m.label
+			}
+			searchItems = append(searchItems, MenuSearchItem{
+				Key:     m.uriName,
+				Group:   "",
+				GroupUI: "",
+				GroupEN: "",
+				LabelUI: m.Info().LabelName(ctx, false),
+				LabelEN: labelEN,
+				URI:     m.Info().URIName(),
+			})
 		}
 	}
-	return menus
+	return menus, searchItems
 }
 
 func (b *MenuOrderBuilder) buildMenuItem(name string, isSub bool, groupName string, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) h.HTMLComponent {
@@ -192,6 +245,10 @@ func (b *MenuOrderBuilder) buildMenuItem(name string, isSub bool, groupName stri
 	if !ok {
 		return nil
 	}
+	return b.buildMenuItemWithModel(m, isSub, groupName, ctx, inOrderMap)
+}
+
+func (b *MenuOrderBuilder) buildMenuItemWithModel(m *ModelBuilder, isSub bool, groupName string, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) h.HTMLComponent {
 	menuItem, err := m.menuItem(ctx, isSub)
 	if err != nil {
 		panic(err)
@@ -200,36 +257,66 @@ func (b *MenuOrderBuilder) buildMenuItem(name string, isSub bool, groupName stri
 		groupName: groupName,
 		model:     m,
 	}
+	if b.searchBoxEnabled {
+		if li, ok := menuItem.(*VListItemBuilder); ok {
+			li.Attr(":style", fmt.Sprintf("locals.hiddenItems && locals.hiddenItems[%q] ? 'display: none !important' : ''", m.uriName))
+			li.Attr("data-menu-item", m.uriName)
+		}
+	}
 	return menuItem
 }
 
-func (b *MenuOrderBuilder) buildMenuGroup(v *MenuGroupBuilder, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) h.HTMLComponent {
+func (b *MenuOrderBuilder) buildMenuGroup(v *MenuGroupBuilder, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) (h.HTMLComponent, []MenuSearchItem) {
 	if !b.hasPermissionForMenuGroup(v, ctx) {
-		return nil
+		return nil, nil
 	}
 
-	subMenus := b.buildSubMenus(v, ctx, inOrderMap)
+	subMenus, subSearchItems := b.buildSubMenus(v, ctx, inOrderMap)
 	if len(subMenus) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	activator := b.buildMenuGroupActivator(v, ctx)
-	return VListGroup(append([]h.HTMLComponent{activator}, subMenus...)...).Value(v.name)
+	group := VListGroup(append([]h.HTMLComponent{activator}, subMenus...)...).Value(v.name)
+	if b.searchBoxEnabled {
+		group.Attr(":style", fmt.Sprintf("locals.hiddenGroups && locals.hiddenGroups[%q] ? 'display: none !important' : ''", v.name))
+		group.Attr("data-menu-group", v.name)
+	}
+	return group, subSearchItems
 }
 
 func (b *MenuOrderBuilder) hasPermissionForMenuGroup(v *MenuGroupBuilder, ctx *web.EventContext) bool {
 	return b.p.verifier.Do(PermList).SnakeOn("mg_"+v.name).WithReq(ctx.R).IsAllowed() == nil
 }
 
-func (b *MenuOrderBuilder) buildSubMenus(v *MenuGroupBuilder, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) []h.HTMLComponent {
+func (b *MenuOrderBuilder) buildSubMenus(v *MenuGroupBuilder, ctx *web.EventContext, inOrderMap map[string]menuOrderItem) ([]h.HTMLComponent, []MenuSearchItem) {
 	var subMenus []h.HTMLComponent
+	var searchItems []MenuSearchItem
+	groupUI := i18n.T(ctx.R, ModelsI18nModuleKey, v.name)
 	for _, subItem := range v.subMenuItems {
-		menuItem := b.buildMenuItem(subItem, true, v.name, ctx, inOrderMap)
+		m, ok := b.check(subItem, v.name, ctx)
+		if !ok {
+			continue
+		}
+		menuItem := b.buildMenuItemWithModel(m, true, v.name, ctx, inOrderMap)
 		if menuItem != nil {
 			subMenus = append(subMenus, menuItem)
+			labelEN := m.Info().Label()
+			if m.label != "" && m.label != labelEN {
+				labelEN = labelEN + " " + m.label
+			}
+			searchItems = append(searchItems, MenuSearchItem{
+				Key:     m.uriName,
+				Group:   v.name,
+				GroupUI: groupUI,
+				GroupEN: v.name,
+				LabelUI: m.Info().LabelName(ctx, false),
+				LabelEN: labelEN,
+				URI:     m.Info().URIName(),
+			})
 		}
 	}
-	return subMenus
+	return subMenus, searchItems
 }
 
 func (b *MenuOrderBuilder) buildMenuGroupActivator(v *MenuGroupBuilder, ctx *web.EventContext) h.HTMLComponent {
@@ -255,23 +342,160 @@ func (b *MenuOrderBuilder) getActiveMenuState(ctx *web.EventContext, inOrderMap 
 	return
 }
 
-func (b *MenuOrderBuilder) buildMenuComponent(menus []h.HTMLComponent, menuGroupSelected, menuItemSelected string) h.HTMLComponent {
+const menuSearchScript = `<script>(function(){` +
+	`if(window.gordpressMenuSearch)return;` +
+	`function norm(s){if(!s)return'';return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}` +
+	`window.gordpressMenuSearch=function(locals,query){` +
+	`if(!locals)return;` +
+	`var q=norm(query);` +
+	`if(!q){` +
+	`locals.hiddenGroups={};` +
+	`locals.hiddenItems={};` +
+	`locals.menuOpened=locals.defaultOpened?[locals.defaultOpened]:[];` +
+	`locals.noMatches=false;` +
+	`return;` +
+	`}` +
+	`var tokens=q.split(/\s+/).filter(Boolean);` +
+	`var items=locals.items||[];` +
+	`var hiddenItems={};` +
+	`var groupMatchedItems={};` +
+	`var groupMatchedTitle={};` +
+	`var allGroups={};` +
+	`var anyItemVisible=false;` +
+	`for(var i=0;i<items.length;i++){` +
+	`var it=items[i];` +
+	`var grp=it.group||'';` +
+	`if(grp){` +
+	`allGroups[grp]=true;` +
+	`if(!groupMatchedTitle[grp]){` +
+	`var gUI=norm(it.groupUI);` +
+	`var gEN=norm(it.groupEN);` +
+	`var gm=tokens.every(function(t){return gUI.indexOf(t)!==-1||gEN.indexOf(t)!==-1;});` +
+	`if(gm){groupMatchedTitle[grp]=true;}` +
+	`}` +
+	`}` +
+	`}` +
+	`for(var j=0;j<items.length;j++){` +
+	`var item=items[j];` +
+	`var g=item.group||'';` +
+	`var lUI=norm(item.labelUI);` +
+	`var lEN=norm(item.labelEN);` +
+	`var uri=norm(item.uri);` +
+	`var gUI=norm(item.groupUI);` +
+	`var gEN=norm(item.groupEN);` +
+	`var im=tokens.every(function(t){return lUI.indexOf(t)!==-1||lEN.indexOf(t)!==-1||uri.indexOf(t)!==-1||gUI.indexOf(t)!==-1||gEN.indexOf(t)!==-1;});` +
+	`if(im){` +
+	`if(g){groupMatchedItems[g]=(groupMatchedItems[g]||0)+1;}` +
+	`anyItemVisible=true;` +
+	`}else{` +
+	`if(g&&groupMatchedTitle[g]){` +
+	`anyItemVisible=true;` +
+	`}else{` +
+	`hiddenItems[item.key]=true;` +
+	`}` +
+	`}` +
+	`}` +
+	`var hiddenGroups={};` +
+	`var openedGroups=[];` +
+	`for(var grpName in allGroups){` +
+	`if(groupMatchedItems[grpName]||groupMatchedTitle[grpName]){` +
+	`openedGroups.push(grpName);` +
+	`}else{` +
+	`hiddenGroups[grpName]=true;` +
+	`}` +
+	`}` +
+	`locals.hiddenItems=hiddenItems;` +
+	`locals.hiddenGroups=hiddenGroups;` +
+	`locals.menuOpened=openedGroups;` +
+	`locals.noMatches=!anyItemVisible;` +
+	`};` +
+	`})();</script>`
+
+func (b *MenuOrderBuilder) buildMenuComponent(ctx *web.EventContext, menus []h.HTMLComponent, menuGroupSelected, menuItemSelected string, searchItems []MenuSearchItem) h.HTMLComponent {
 	if b.menuComponentFunc != nil {
 		return b.menuComponentFunc(menus, menuGroupSelected, menuItemSelected)
 	}
+
+	if !b.searchBoxEnabled || len(searchItems) == 0 {
+		return h.Div(
+			web.Scope(
+				VList(menus...).
+					OpenStrategy("single").
+					Class("primary--text").
+					Density(DensityCompact).
+					Attr("v-model:opened", "locals.menuOpened").
+					Attr("v-model:selected", "locals.selection").
+					Attr("color", "transparent"),
+			).VSlot("{ locals }").Init(
+				fmt.Sprintf(`{ menuOpened: [%q] }`, menuGroupSelected),
+				fmt.Sprintf(`{ selection: [%q] }`, menuItemSelected),
+			),
+		)
+	}
+
+	msgr := MustGetMessages(ctx.R)
+	placeholder := msgr.SearchMenu
+	if placeholder == "" {
+		if strings.HasPrefix(strings.ToLower(msgr.Search), "busc") {
+			placeholder = "Buscar menu..."
+		} else {
+			placeholder = "Search menu..."
+		}
+	}
+	noMatchText := msgr.NoMatchingMenus
+	if noMatchText == "" {
+		if strings.HasPrefix(strings.ToLower(msgr.Search), "busc") {
+			noMatchText = "Nenhum menu encontrado"
+		} else {
+			noMatchText = "No matching menus"
+		}
+	}
+
+	searchField := VTextField().
+		Placeholder(placeholder).
+		Density(DensityCompact).
+		Variant(VariantOutlined).
+		PrependInnerIcon("mdi-magnify").
+		HideDetails(true).
+		Clearable(true).
+		Class("menu-search-box mb-2").
+		Attr("v-model", "locals.menuSearch").
+		Attr("@update:model-value", "window.gordpressMenuSearch(locals, $event)").
+		Attr("@click:clear", "window.gordpressMenuSearch(locals, '')").
+		Attr("@keydown.esc", "locals.menuSearch = ''; window.gordpressMenuSearch(locals, '')")
+
+	noMatchComp := h.Div(
+		VIcon("mdi-magnify").Size(SizeSmall).Class("mb-1 text-medium-emphasis"),
+		h.Div().Text(noMatchText).Class("text-caption text-medium-emphasis"),
+	).Class("text-center py-4").Attr("v-if", "locals.noMatches")
+
+	if ctx.Injector != nil {
+		ctx.Injector.TailHTMLComponent("gordpressMenuSearch", h.RawHTML(menuSearchScript), true)
+	}
+
+	itemsJSON, _ := json.Marshal(searchItems)
+	openedInit := "[]"
+	if menuGroupSelected != "" {
+		openedInit = fmt.Sprintf("[%q]", menuGroupSelected)
+	}
+	initScript := fmt.Sprintf(`{ menuOpened: %s, defaultOpened: %q, selection: [%q], menuSearch: "", hiddenGroups: {}, hiddenItems: {}, noMatches: false, items: %s }`,
+		openedInit, menuGroupSelected, menuItemSelected, string(itemsJSON))
+
 	return h.Div(
 		web.Scope(
-			VList(menus...).
-				OpenStrategy("single").
-				Class("primary--text").
-				Density(DensityCompact).
-				Attr("v-model:opened", "locals.menuOpened").
-				Attr("v-model:selected", "locals.selection").
-				Attr("color", "transparent"),
-		).VSlot("{ locals }").Init(
-			fmt.Sprintf(`{ menuOpened: [%q] }`, menuGroupSelected),
-			fmt.Sprintf(`{ selection: [%q] }`, menuItemSelected),
-		),
+			h.Div(
+				searchField,
+				VList(menus...).
+					Attr(":open-strategy", "locals.menuSearch ? 'multiple' : 'single'").
+					Class("primary--text").
+					Density(DensityCompact).
+					Attr("v-model:opened", "locals.menuOpened").
+					Attr("v-model:selected", "locals.selection").
+					Attr("color", "transparent"),
+				noMatchComp,
+				h.If(ctx.Injector == nil, h.RawHTML(menuSearchScript)),
+			),
+		).VSlot("{ locals }").Init(initScript),
 	)
 }
 
