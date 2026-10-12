@@ -411,6 +411,75 @@ const menuSearchScript = `<script>(function(){` +
 	`};` +
 	`})();</script>`
 
+const menuSearchMountedScript = `({window, watch}) => {
+	function norm(s){if(!s)return'';return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+	function doSearch(q){
+		q=norm(q);
+		if(!q){
+			locals.hiddenGroups={};
+			locals.hiddenItems={};
+			locals.menuOpened=locals.defaultOpened?[locals.defaultOpened]:[];
+			locals.noMatches=false;
+			return;
+		}
+		var tokens=q.split(/\s+/).filter(Boolean);
+		var items=locals.items||[];
+		var hiddenItems={};
+		var groupMatchedItems={};
+		var groupMatchedTitle={};
+		var allGroups={};
+		var anyItemVisible=false;
+		for(var i=0;i<items.length;i++){
+			var it=items[i];
+			var grp=it.group||'';
+			if(grp){
+				allGroups[grp]=true;
+				if(!groupMatchedTitle[grp]){
+					var gUI=norm(it.groupUI);
+					var gEN=norm(it.groupEN);
+					var gm=tokens.every(function(t){return gUI.indexOf(t)!==-1||gEN.indexOf(t)!==-1;});
+					if(gm){groupMatchedTitle[grp]=true;}
+				}
+			}
+		}
+		for(var j=0;j<items.length;j++){
+			var item=items[j];
+			var g=item.group||'';
+			var lUI=norm(item.labelUI);
+			var lEN=norm(item.labelEN);
+			var uri=norm(item.uri);
+			var gUI=norm(item.groupUI);
+			var gEN=norm(item.groupEN);
+			var im=tokens.every(function(t){return lUI.indexOf(t)!==-1||lEN.indexOf(t)!==-1||uri.indexOf(t)!==-1||gUI.indexOf(t)!==-1||gEN.indexOf(t)!==-1;});
+			if(im){
+				if(g){groupMatchedItems[g]=(groupMatchedItems[g]||0)+1;}
+				anyItemVisible=true;
+			}else{
+				if(g&&groupMatchedTitle[g]){
+					anyItemVisible=true;
+				}else{
+					hiddenItems[item.key]=true;
+				}
+			}
+		}
+		var hiddenGroups={};
+		var openedGroups=[];
+		for(var grpName in allGroups){
+			if(groupMatchedItems[grpName]||groupMatchedTitle[grpName]){
+				openedGroups.push(grpName);
+			}else{
+				hiddenGroups[grpName]=true;
+			}
+		}
+		locals.hiddenItems=hiddenItems;
+		locals.hiddenGroups=hiddenGroups;
+		locals.menuOpened=openedGroups;
+		locals.noMatches=!anyItemVisible;
+	}
+	if(window){window.gordpressMenuSearch=function(loc,q){doSearch(q);};}
+	watch(() => locals.menuSearch, (val) => { doSearch(val); });
+}`
+
 func (b *MenuOrderBuilder) buildMenuComponent(ctx *web.EventContext, menus []h.HTMLComponent, menuGroupSelected, menuItemSelected string, searchItems []MenuSearchItem) h.HTMLComponent {
 	if b.menuComponentFunc != nil {
 		return b.menuComponentFunc(menus, menuGroupSelected, menuItemSelected)
@@ -460,9 +529,8 @@ func (b *MenuOrderBuilder) buildMenuComponent(ctx *web.EventContext, menus []h.H
 		Clearable(true).
 		Class("menu-search-box mb-2").
 		Attr("v-model", "locals.menuSearch").
-		Attr("@update:model-value", "window.gordpressMenuSearch(locals, $event)").
-		Attr("@click:clear", "window.gordpressMenuSearch(locals, '')").
-		Attr("@keydown.esc", "locals.menuSearch = ''; window.gordpressMenuSearch(locals, '')")
+		Attr("@click:clear", "locals.menuSearch = ''").
+		Attr("@keydown.esc", "locals.menuSearch = ''")
 
 	noMatchComp := h.Div(
 		VIcon("mdi-magnify").Size(SizeSmall).Class("mb-1 text-medium-emphasis"),
@@ -494,7 +562,7 @@ func (b *MenuOrderBuilder) buildMenuComponent(ctx *web.EventContext, menus []h.H
 					Attr("color", "transparent"),
 				noMatchComp,
 				h.If(ctx.Injector == nil, h.RawHTML(menuSearchScript)),
-			),
+			).Attr("v-on-mounted", menuSearchMountedScript),
 		).VSlot("{ locals }").Init(initScript),
 	)
 }
